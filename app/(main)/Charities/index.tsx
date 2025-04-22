@@ -1,10 +1,12 @@
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, ActivityIndicator } from "react-native";
 import React from "react";
 import SearchBar from "@/components/SearchBar";
 import { Charity } from "@/types/charity.types";
 import CharityItem from "@/components/CharityItem";
 import CategoryContainer from "@/components/CategoryContainer";
-
+import { useQuery } from "@tanstack/react-query";
+import fetchData from "@/utils/fetchData";
+import { BACKENDURL } from "@/constants";
 const numberOfColumns = 2;
 
 export const dummyCharities: Charity[] = [
@@ -56,7 +58,7 @@ export const dummyCharities: Charity[] = [
   //   imgId: "smile-img-005",
   // },
 ];
-const catigroies = [
+const categroies = [
   "Enviroment",
   "Children",
   "Health",
@@ -69,14 +71,26 @@ const ItemSeparator = () => (
 );
 
 const Charities = () => {
+
+  const {
+    data: charities,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["charities"],
+    queryFn: () => fetchData(`${BACKENDURL}/charity/all`),
+  });
+
+
+
+
   return (
     <View className="flex-1 my-16 mx-4 gap-5 items-center">
       <FlatList
-        data={dummyCharities}
+        data={!isLoading && !isError ? charities: []}
         keyExtractor={(charity) => charity.id.toString()}
-        renderItem={({ item: charity }) => <CharityItem charity={charity} />}
+        renderItem={({ item: charity }) => <CharityItem id= {charity.id.toString()} imgUrl={charity.imgUrl} />}
         columnWrapperStyle={{
-          backgroundColor: "blackk",
           display: "flex",
           justifyContent: "space-around",
           marginTop: 20,
@@ -97,7 +111,18 @@ const Charities = () => {
               Charities
             </Text>
             <SearchBar placeholder="Search" />
-            <CategoryContainer data={catigroies} />
+            <CategoryContainer data={categroies} />
+            {isLoading && (
+              <View className="flex-1 items-center justify-center mt-10">
+                <ActivityIndicator size="large" color="#4fa94d" />
+              </View>
+            )}
+
+            {!isLoading && isError && (
+              <Text className="text-4xl text-red-600 text-center mt-10">
+                There was an error fetching data.
+              </Text>
+            )}
           </View>
         }
       />

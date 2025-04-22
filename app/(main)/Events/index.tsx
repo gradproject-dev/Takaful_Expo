@@ -83,7 +83,7 @@ const Events = () => {
     isError,
   } = useQuery({
     queryKey: ["events"],
-    queryFn: () => fetchData(`${BACKENDURL}/event/all`, ""),
+    queryFn: () => fetchData(`${BACKENDURL}/event/all`),
   });
 
   return (
@@ -96,8 +96,8 @@ const Events = () => {
             id={item.id.toString()}
             name={item.name}
             description={item.description}
-            charityName={item.charity.name}
-            charityImage={item.charity.imgUrl}
+            charityName={item.charity?.name}
+            charityImage={item.charity?.imgUrl}
             numDonations={0}
             date={item.date}
             image={item.imgsUrl[0]}

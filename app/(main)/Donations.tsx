@@ -83,7 +83,7 @@ const Donations = () => {
     isError,
   } = useQuery({
     queryKey: ["donations"],
-    queryFn: () => fetchData(`${BACKENDURL}/donation/all`, ""),
+    queryFn: () => fetchData(`${BACKENDURL}/donation/all`),
   });
 
   console.log(donations);

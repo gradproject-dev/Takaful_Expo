@@ -28,9 +28,7 @@ const EventItme = ({
   id,
 }: props) => {
   const router = useRouter();
-  const {signOut, auth } = useAuth();
-  console.log("auth", auth);
-  const handleEvent = () => signOut();
+  const handleEvent = () => router.push(`/EventDetails/${id}`);
   return (
     <Custombutton
       buttonStyles="bg-white flex-row rounded-xl h-36"

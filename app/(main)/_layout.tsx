@@ -1,7 +1,7 @@
 import { View, Image, ImageSourcePropType , Text} from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
-
+import { useJWT } from "@/contexts/authContext";
 import mainIcon from "../../assets/images/main.png";
 import profileIcon from "../../assets/images/profile.png";
 import charityIcon from "../../assets/images/char.png";
@@ -12,7 +12,6 @@ type TabIconProps = {
   focused: boolean;
   iconSource: ImageSourcePropType;
 };
-
 const TabIcon = ({ title, focused, iconSource }: TabIconProps) => {
 
   return (
@@ -28,6 +27,8 @@ const TabIcon = ({ title, focused, iconSource }: TabIconProps) => {
 };
 
 const _Layout = () => {
+  const { jwt } = useJWT();
+  
   return (
     <Tabs
       screenOptions={{
@@ -87,7 +88,7 @@ const _Layout = () => {
           ),
         }}
       />
-      <Tabs.Screen
+     {<Tabs.Screen
         name="Profile"
         options={{
           title: "profile",
@@ -100,7 +101,7 @@ const _Layout = () => {
             />
           ),
         }}
-      />
+      />}
        
     </Tabs>
   );

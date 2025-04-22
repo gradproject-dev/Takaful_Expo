@@ -1,21 +1,23 @@
 //Get data from API
-export default async function fetchData(url, searchTerm = "") {
-  if (searchTerm) url += `?search=${searchTerm}`;
+export default async function fetchData(url,  { searchTerm ,  id } = {}) {
+  if (id) url += `?id=${id}`;
+  else if (searchTerm) url += `?search=${searchTerm}`;
   try {
     console.log(url);
     const response = await fetch(url);
     if (!response.ok) {
-      console.log(response);
       throw new Error("Network response was not ok");
     }
 
     const data = await response.json();
     return data;
   } catch (error) {
-    ``;
     throw new Error("Error fetching data: " + error.message);
   }
 }
+
+
+
 
 // Post data to API
 export async function postData(url, data) {

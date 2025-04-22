@@ -4,10 +4,10 @@ import { useJWT } from "@/contexts/authContext";
 import { Redirect } from "expo-router";
 
 const Profile = () => {
-  const { jwt, isLoading } = useJWT();
+  // const { jwt, isLoading } = useJWT();
 
-  if (isLoading) return <Text>Shit is loading</Text>;
-  if (!jwt) return <Redirect href="/Auth" />;
+  // if (isLoading) return <Text>Shit is loading</Text>;
+  // if (!jwt) return <Redirect href="/Auth" />;
   return (
     <View>
       <Text>Profile</Text>

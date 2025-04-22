@@ -5,11 +5,8 @@ import { View } from "react-native";
 
 const { width } = Dimensions.get("window");
 import item from "@/assets/images/item.png";
-const images = [
-  item,item,item
-];
 
-const ImageSlider = () => {
+const ImageSlider = ({images}: {images: string[]}) => {
   return (
     <View style={styles.wrapper}>
       <Swiper
@@ -22,7 +19,7 @@ const ImageSlider = () => {
         {images.map((image, index) => (
           <Image
             key={index}
-            source={image}
+            source={{uri : image}}
             resizeMode="cover"
             style={styles.image}
           />

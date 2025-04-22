@@ -5,20 +5,20 @@ import React from "react";
 import { Image, Pressable, Text } from "react-native";
 
 type CharityItemProps = {
-  charity: Charity;
+  id: string;
+  imgUrl: string;
 };
 
-const CharityItem = ({ charity }: CharityItemProps) => {
+const CharityItem = ({ imgUrl , id}: CharityItemProps) => {
   return (
-    <Link href={`/CharityDetails/${charity.id}`} asChild>
+    <Link href={`/CharityDetails/${id}`} asChild>
       <Pressable
         onPress={() => {
           registerForPushNotificationsAsync(16);
         }}
       >
-        <Text>asdasdsa</Text>
         <Image
-          source={{ uri: charity.imgUrl }}
+          source={{ uri: imgUrl }}
           style={{ width: 100, height: 100, borderRadius: 10 }}
         />
       </Pressable>
