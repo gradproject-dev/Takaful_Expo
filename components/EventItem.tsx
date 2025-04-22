@@ -5,6 +5,7 @@ import dateImage from "@/assets/images/date.png";
 import Custombutton from "./Button";
 import { useRouter } from "expo-router";
 import formatDate from "@/utils/formatDate";
+import { useAuth } from "@/contexts/authContext";
 interface props {
   name: string;
   description: string;
@@ -27,7 +28,9 @@ const EventItme = ({
   id,
 }: props) => {
   const router = useRouter();
-  const handleEvent = () => router.push(`/EventDetails/${id}`);
+  const {signOut, auth } = useAuth();
+  console.log("auth", auth);
+  const handleEvent = () => signOut();
   return (
     <Custombutton
       buttonStyles="bg-white flex-row rounded-xl h-36"
