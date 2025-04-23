@@ -7,6 +7,8 @@ import CategoryContainer from "@/components/CategoryContainer";
 import { useQuery } from "@tanstack/react-query";
 import fetchData from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
+import Sign from "@/components/Sign";
+import { useAuth } from "@/contexts/authContext";
 const dataDummy = [
   {
     id: Math.random(),
@@ -77,6 +79,7 @@ const ItemSeparator = () => (
 );
 
 const Events = () => {
+  const {auth} = useAuth();
   const {
     data: events,
     isPending,
@@ -87,7 +90,19 @@ const Events = () => {
   });
 
   return (
-    <View className="flex-1 my-16 mx-4 gap-5  items-center">
+    <>      
+    {!auth && <Sign buttonStyles="absolute top-16 right-8 z-10  bg-blue-500 rounded-2xl" type="signin">
+      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
+          Sign In
+        </Text>
+        </Sign>}
+    {auth &&<Sign buttonStyles="absolute top-16 left-8 z-10 bg-red-500 rounded-2xl"  type="signout">
+      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
+          Sign Out
+        </Text>
+      </Sign>}
+
+    <View className="flex-1 my-24 mx-4 gap-5  items-center">
       <FlatList
         data={!isPending && !isError ? events : []}
         keyExtractor={(item) => item.id.toString()}
@@ -129,6 +144,7 @@ const Events = () => {
         }
       />
     </View>
+    </>
   );
 };
 

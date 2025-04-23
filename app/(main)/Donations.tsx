@@ -3,10 +3,11 @@ import React from "react";
 import SearchBar from "@/components/SearchBar";
 import DonationItem from "@/components/donationItem";
 import CategoryContainer from "@/components/CategoryContainer";
-import clothes from "@/assets/images/clothes.png";
 import { useQuery } from "@tanstack/react-query";
 import fetchData from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
+import { useAuth } from "@/contexts/authContext";
+import Sign from "@/components/Sign";
 const data = [
   {
     id: Math.random(),
@@ -73,10 +74,11 @@ const categroies = [
 ];
 
 const ItemSeparator = () => (
-  <View style={{ height: 10 }} /> // Adjust the height to set the gap size
+  <View style={{ height: 10 }} /> 
 );
 
 const Donations = () => {
+  const {auth} = useAuth();
   const {
     data: donations,
     isPending,
@@ -84,11 +86,22 @@ const Donations = () => {
   } = useQuery({
     queryKey: ["donations"],
     queryFn: () => fetchData(`${BACKENDURL}/donation/all`),
+    staleTime: 1000 * 15, //15 seconds
   });
 
-  console.log(donations);
   return (
-    <View className="flex-1 my-16 mx-4 gap-5 items-center">
+  <> 
+     {!auth && <Sign buttonStyles="absolute top-16 right-8 z-10  bg-blue-500 rounded-2xl" type="signin">
+      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
+          Sign In
+        </Text>
+        </Sign>}
+    {auth &&<Sign buttonStyles="absolute top-16 left-8 z-10 bg-red-500 rounded-2xl"  type="signout">
+      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
+          Sign Out
+        </Text>
+      </Sign>}
+    <View className="flex-1 my-24 mx-4 gap-5 items-center">
       <FlatList
         data={!isPending && !isError ? donations : []}
         keyExtractor={(item) => item.id.toString()}
@@ -96,9 +109,9 @@ const Donations = () => {
           <DonationItem
             itemId={item.id.toString()}
             itemName={item.name}
-            description={item.description}
+            description={item?.description}
             rating={item.quality}
-            donor={item.user.email}
+            donor={item.donor.name}
             catigroy={item.category.name}
             image={item.imgsUrl}
           />
@@ -129,7 +142,31 @@ const Donations = () => {
         }
       />
     </View>
+    </>
   );
 };
 
 export default Donations;
+// {
+//   "name": "Winter Jacket",
+//   "description": "this is a description about jeans",
+//   "quality": 1,
+//   "imgsUrl": [
+//       "https://gp-charity-images.s3.eu-north-1.amazonaws.com/box-1745424356731-512c787d-0408-41b3-bb91-d43c239ae11f.jpeg"
+//   ],
+//   "imgsId": [
+//       "box-1745424356731-512c787d-0408-41b3-bb91-d43c239ae11f.jpeg"
+//   ],
+//   "categoryId": 1,
+//   "donor": {
+//       "id": 4,
+//       "phone": "211321321",
+//       "name": "mahde",
+//       "email": "mahde121232133@gmail.com",
+//       "address": "30st",
+//       "imgId": null,
+//       "imgUrl": null,
+//       "deletedAt": null
+//   },
+//   "id": 7
+// }

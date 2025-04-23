@@ -7,6 +7,8 @@ import CategoryContainer from "@/components/CategoryContainer";
 import { useQuery } from "@tanstack/react-query";
 import fetchData from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
+import { useAuth } from "@/contexts/authContext";
+import Sign from "@/components/Sign";
 const numberOfColumns = 2;
 
 export const dummyCharities: Charity[] = [
@@ -71,7 +73,7 @@ const ItemSeparator = () => (
 );
 
 const Charities = () => {
-
+   const { auth } = useAuth();
   const {
     data: charities,
     isLoading,
@@ -79,13 +81,25 @@ const Charities = () => {
   } = useQuery({
     queryKey: ["charities"],
     queryFn: () => fetchData(`${BACKENDURL}/charity/all`),
+    staleTime: 1000 * 15, //15 seconds
+    gcTime: 1000 * 60 * 5, //5 minutes
   });
 
 
 
-
   return (
-    <View className="flex-1 my-16 mx-4 gap-5 items-center">
+    <> 
+    {!auth && <Sign buttonStyles="absolute top-16 right-8 z-10  bg-blue-500 rounded-2xl" type="signin">
+      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
+          Sign In
+        </Text>
+        </Sign>}
+    {auth &&<Sign buttonStyles="absolute top-16 left-8 z-10 bg-red-500 rounded-2xl"  type="signout">
+      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
+          Sign Out
+        </Text>
+      </Sign>}
+    <View className="flex-1 my-24 mx-4 gap-5 items-center">
       <FlatList
         data={!isLoading && !isError ? charities: []}
         keyExtractor={(charity) => charity.id.toString()}
@@ -127,6 +141,7 @@ const Charities = () => {
         }
       />
     </View>
+    </>
   );
 };
 

@@ -28,7 +28,6 @@ const TabIcon = ({ title, focused, iconSource }: TabIconProps) => {
 
 const _Layout = () => {
   const { jwt } = useJWT();
-  
   return (
     <Tabs
       screenOptions={{
@@ -88,7 +87,7 @@ const _Layout = () => {
           ),
         }}
       />
-     {<Tabs.Screen
+     <Tabs.Screen
         name="Profile"
         options={{
           title: "profile",
@@ -101,7 +100,7 @@ const _Layout = () => {
             />
           ),
         }}
-      />}
+      />
        
     </Tabs>
   );
