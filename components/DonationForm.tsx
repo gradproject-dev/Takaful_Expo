@@ -1,59 +1,75 @@
-import { View, Text, TextInput, TouchableOpacity, Modal, Pressable, Image, ScrollView, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+  Image,
+  ScrollView,
+  Alert,
+} from "react-native";
 import React, { useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { useQuery } from "@tanstack/react-query";
 import fetchData from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
-import { FontAwesome } from '@expo/vector-icons';
+import { FontAwesome } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/authContext";
+import { CreateDonationDto } from "@/types/donation.dto";
 
 interface Props {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (data: {
-    name: string;
-    quality: number;
-    description?: string;
-    imgUrl: string[];
-    categoryId: number;
-    donorId: number;
-    charityId?: number;
-  }) => void;
+  onSubmit: (data: CreateDonationDto) => void;
 }
 
 const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
-const {auth} = useAuth()
+  const { auth } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [itemName, setItemName] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    null
+  );
   const [description, setDescription] = useState("");
   const [quality, setQuality] = useState<number>(1);
   const [images, setImages] = useState<string[]>([]);
 
-  const { data: categories, isLoading, isError } = useQuery({
-    queryKey: ['categories'],
+  const {
+    data: categories,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["categories"],
     queryFn: () => fetchData(`${BACKENDURL}/category/all`),
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
   });
   const handleSubmit = () => {
-    if (!itemName.trim() || selectedCategoryId === null || !description.trim() || images.length === 0) {
-      Alert.alert("Missing fields", "Please fill all fields and upload at least one image.");
+    if (
+      !itemName.trim() ||
+      selectedCategoryId === null ||
+      !description.trim() ||
+      images.length === 0
+    ) {
+      Alert.alert(
+        "Missing fields",
+        "Please fill all fields and upload at least one image."
+      );
       return;
     }
 
-    const donationData = {
+    const donationData: CreateDonationDto = {
       name: itemName,
       quality,
       description,
       files: images,
       categoryId: selectedCategoryId,
-      donorId: auth?.id,
-      
+      // guests can't access the page so auth.id will always be available
+      donorId: auth!.id,
     };
     setIsSubmitting(true);
     onSubmit(donationData);
-
     setItemName("");
     setSelectedCategoryId(null);
     setDescription("");
@@ -63,7 +79,8 @@ const {auth} = useAuth()
   };
 
   const pickImage = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
       alert("Permission to access media library is required!");
       return;
@@ -86,20 +103,44 @@ const {auth} = useAuth()
   };
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable onPress={onClose} className="flex-1 bg-black/30 justify-center items-center">
-        <Pressable onPress={() => {}} className="bg-white w-11/12 p-5 rounded-xl gap-4">
-          <Text className="text-xl font-bold text-center">Add New Donation</Text>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <Pressable
+        onPress={onClose}
+        className="flex-1 bg-black/30 justify-center items-center"
+      >
+        <Pressable
+          onPress={() => {}}
+          className="bg-white w-11/12 p-5 rounded-xl gap-4"
+        >
+          <Text className="text-xl font-bold text-center">
+            Add New Donation
+          </Text>
 
-          <TouchableOpacity onPress={pickImage} className="bg-gray-200 p-3 rounded-lg items-center">
+          <TouchableOpacity
+            onPress={pickImage}
+            className="bg-gray-200 p-3 rounded-lg items-center"
+          >
             <Text className="text-gray-700">Pick Images</Text>
           </TouchableOpacity>
 
           {images.length > 0 && (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="my-2">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              className="my-2"
+            >
               {images.map((uri) => (
                 <View key={uri} className="mr-2 relative">
-                  <Image source={{ uri }} className="w-24 h-24 rounded-md" resizeMode="cover" />
+                  <Image
+                    source={{ uri }}
+                    className="w-24 h-24 rounded-md"
+                    resizeMode="cover"
+                  />
                   <TouchableOpacity
                     onPress={() => removeImage(uri)}
                     className="absolute top-0 right-0 bg-red-600 rounded-full p-1"
@@ -127,14 +168,32 @@ const {auth} = useAuth()
           />
 
           <Text className="font-semibold">Select Category:</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row mb-2">
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="flex-row mb-2"
+          >
             {categories?.map((cat: { id: number; name: string }) => (
               <TouchableOpacity
                 key={cat.id}
-                onPress={() => setSelectedCategoryId(prev => prev === cat.id ? null : cat.id)}
-                className={`px-3 py-2 rounded-md border mr-2 ${selectedCategoryId === cat.id ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`}
+                onPress={() =>
+                  setSelectedCategoryId((prev) =>
+                    prev === cat.id ? null : cat.id
+                  )
+                }
+                className={`px-3 py-2 rounded-md border mr-2 ${
+                  selectedCategoryId === cat.id
+                    ? "bg-blue-600 border-blue-600"
+                    : "border-gray-300"
+                }`}
               >
-                <Text className={selectedCategoryId === cat.id ? 'text-white' : 'text-gray-800'}>
+                <Text
+                  className={
+                    selectedCategoryId === cat.id
+                      ? "text-white"
+                      : "text-gray-800"
+                  }
+                >
                   {cat.name}
                 </Text>
               </TouchableOpacity>
@@ -146,17 +205,23 @@ const {auth} = useAuth()
             {[1, 2, 3, 4, 5].map((star) => (
               <TouchableOpacity key={star} onPress={() => setQuality(star)}>
                 <FontAwesome
-                  name={quality >= star ? 'star' : 'star-o'}
+                  name={quality >= star ? "star" : "star-o"}
                   size={28}
-                  color={quality >= star ? '#facc15' : '#d1d5db'}
+                  color={quality >= star ? "#facc15" : "#d1d5db"}
                 />
               </TouchableOpacity>
             ))}
           </View>
 
-          <Text className="text-center text-gray-500">Selected Quality: {quality} star{quality > 1 ? 's' : ''}</Text>
+          <Text className="text-center text-gray-500">
+            Selected Quality: {quality} star{quality > 1 ? "s" : ""}
+          </Text>
 
-          <TouchableOpacity className="bg-blue-500 py-2 rounded-lg mt-2" onPress={handleSubmit} disabled={isSubmitting}>
+          <TouchableOpacity
+            className="bg-blue-500 py-2 rounded-lg mt-2"
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+          >
             <Text className="text-white text-xl text-center font-semibold">
               {isSubmitting ? "Submitting..." : "Submit"}
             </Text>
