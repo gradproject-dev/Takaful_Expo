@@ -1,12 +1,12 @@
 import { View, Text, Image, TextInput, TouchableOpacity } from "react-native";
 import React from "react";
+import search from "../assets/images/search.png";
 interface props {
   placeholder?: string;
   onPress?: () => void;
   value?: string;
   onChangeText?: (text: string) => void;
 }
-const search = require("@/assets/images/search.png");
 
 const SearchBar = ({ onPress, placeholder, value, onChangeText }: props) => {
   return (
@@ -22,7 +22,7 @@ const SearchBar = ({ onPress, placeholder, value, onChangeText }: props) => {
         onPress={onPress}
         placeholder={placeholder}
         value={value}
-        onChangeText={onChangeText}
+        onChangeText={(text)=> onChangeText &&  onChangeText(text)}
         placeholderTextColor="#094067"
         className="flex-1 ml-2 "
         style={{ paddingVertical: 0, height: 40, fontSize: 16, lineHeight: 22 }}

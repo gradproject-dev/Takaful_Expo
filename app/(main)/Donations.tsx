@@ -1,5 +1,5 @@
 import { View, Text, FlatList, ActivityIndicator } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import DonationItem from "@/components/donationItem";
 import CategoryContainer from "@/components/CategoryContainer";
@@ -79,6 +79,9 @@ const ItemSeparator = () => (
 
 const Donations = () => {
   const {auth} = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const {
     data: donations,
     isPending,
@@ -89,21 +92,33 @@ const Donations = () => {
     staleTime: 1000 * 15, //15 seconds
   });
 
+  const handleClick = (id: string) => {
+    if (selectedCategory.includes(id)) {
+      setSelectedCategory((selectedCategory) =>
+        selectedCategory.filter((item) => item !== id)
+      );
+    } else {
+      setSelectedCategory((selectedCategory) => [...selectedCategory, id]);
+    }
+  };
+  let filteredData = donations || [];
+
+  if (selectedCategory.length > 0) {
+    filteredData = filteredData.filter((item : {categoryId:string}) =>
+      selectedCategory.includes(item.categoryId.toString())
+    );
+  }
+  
+  if (searchQuery) {
+    filteredData = filteredData.filter((item:{name :string}) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
   return (
-  <> 
-     {!auth && <Sign buttonStyles="absolute top-16 right-8 z-10  bg-blue-500 rounded-2xl" type="signin">
-      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
-          Sign In
-        </Text>
-        </Sign>}
-    {auth &&<Sign buttonStyles="absolute top-16 left-8 z-10 bg-red-500 rounded-2xl"  type="signout">
-      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
-          Sign Out
-        </Text>
-      </Sign>}
+ 
     <View className="flex-1 my-24 mx-4 gap-5 items-center">
       <FlatList
-        data={!isPending && !isError ? donations : []}
+        data={ !isPending && !isError ? filteredData : []  }
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <DonationItem
@@ -125,8 +140,8 @@ const Donations = () => {
             <Text className="text-5xl font-bold text-center text-[#094067] mb-6">
               Donations
             </Text>
-            <SearchBar placeholder="Search" />
-            <CategoryContainer data={categroies} />
+            <SearchBar placeholder="Search" onChangeText={setSearchQuery} value={searchQuery}/>
+            <CategoryContainer hanldeCategoryClick={handleClick} selectedCategory={selectedCategory}/>
             {isPending && (
               <View className="flex-1 items-center justify-center mt-10">
                 <ActivityIndicator size="large" color="blue" />
@@ -142,7 +157,6 @@ const Donations = () => {
         }
       />
     </View>
-    </>
   );
 };
 

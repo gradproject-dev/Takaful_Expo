@@ -17,6 +17,11 @@ export default async function fetchData(url,  { searchTerm ,  id } = {}) {
 }
 
 
+const fetchByCategories = async (url , categories) => {
+  const res = await fetch(`${url}?categories=${categories.join(',')}`);
+  if (!res.ok) throw new Error('Failed to fetch');
+  return res.json();
+}
 
 
 // Post data to API

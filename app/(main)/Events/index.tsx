@@ -1,5 +1,5 @@
 import { View, Text, FlatList, ActivityIndicator } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import EventItem from "@/components/EventItem";
 import CategoryItem from "@/components/CategoryItem";
@@ -80,6 +80,7 @@ const ItemSeparator = () => (
 
 const Events = () => {
   const {auth} = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
   const {
     data: events,
     isPending,
@@ -88,23 +89,17 @@ const Events = () => {
     queryKey: ["events"],
     queryFn: () => fetchData(`${BACKENDURL}/event/all`),
   });
-
+  let filteredEvents = events;
+  if (searchQuery && events) {
+    filteredEvents = events.filter((event: {name:string}) =>
+      event.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
   return (
-    <>      
-    {!auth && <Sign buttonStyles="absolute top-16 right-8 z-10  bg-blue-500 rounded-2xl" type="signin">
-      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
-          Sign In
-        </Text>
-        </Sign>}
-    {auth &&<Sign buttonStyles="absolute top-16 left-8 z-10 bg-red-500 rounded-2xl"  type="signout">
-      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
-          Sign Out
-        </Text>
-      </Sign>}
-
+   
     <View className="flex-1 my-24 mx-4 gap-5  items-center">
       <FlatList
-        data={!isPending && !isError ? events : []}
+        data={!isPending && !isError ? filteredEvents : []}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <EventItem
@@ -127,8 +122,7 @@ const Events = () => {
             <Text className="text-5xl font-bold text-center text-[#094067] mb-6">
               Events
             </Text>
-            <SearchBar placeholder="Search" />
-            <CategoryContainer data={catigroies} />
+            <SearchBar placeholder="Search" onChangeText={setSearchQuery} value={searchQuery}/>
             {isPending && (
               <View className="flex-1 items-center justify-center mt-10">
                 <ActivityIndicator size="large" color="#4fa94d" />
@@ -144,7 +138,7 @@ const Events = () => {
         }
       />
     </View>
-    </>
+    
   );
 };
 

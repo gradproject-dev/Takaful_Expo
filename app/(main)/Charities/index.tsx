@@ -1,5 +1,5 @@
 import { View, Text, FlatList, ActivityIndicator } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import { Charity } from "@/types/charity.types";
 import CharityItem from "@/components/CharityItem";
@@ -74,6 +74,8 @@ const ItemSeparator = () => (
 
 const Charities = () => {
    const { auth } = useAuth();
+   const [searchQuery, setSearchQuery] = useState("");
+
   const {
     data: charities,
     isLoading,
@@ -85,23 +87,18 @@ const Charities = () => {
     gcTime: 1000 * 60 * 5, //5 minutes
   });
 
+  let  filteredData= charities;
+  if (searchQuery && charities) {
+    filteredData = charities.filter((event: {name:string}) =>
+      event.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
 
-
-  return (
-    <> 
-    {!auth && <Sign buttonStyles="absolute top-16 right-8 z-10  bg-blue-500 rounded-2xl" type="signin">
-      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
-          Sign In
-        </Text>
-        </Sign>}
-    {auth &&<Sign buttonStyles="absolute top-16 left-8 z-10 bg-red-500 rounded-2xl"  type="signout">
-      <Text className={`text-md text-white py-2 px-4 rounded-xl`} >
-          Sign Out
-        </Text>
-      </Sign>}
+  return (  
+  
     <View className="flex-1 my-24 mx-4 gap-5 items-center">
       <FlatList
-        data={!isLoading && !isError ? charities: []}
+        data={!isLoading && !isError ? filteredData: []}
         keyExtractor={(charity) => charity.id.toString()}
         renderItem={({ item: charity }) => <CharityItem id= {charity.id.toString()} imgUrl={charity.imgUrl} />}
         columnWrapperStyle={{
@@ -124,8 +121,7 @@ const Charities = () => {
             <Text className="text-5xl font-bold text-center text-[#094067] mb-6">
               Charities
             </Text>
-            <SearchBar placeholder="Search" />
-            <CategoryContainer data={categroies} />
+            <SearchBar placeholder="Search" onChangeText={setSearchQuery} value={searchQuery}/>
             {isLoading && (
               <View className="flex-1 items-center justify-center mt-10">
                 <ActivityIndicator size="large" color="#4fa94d" />
@@ -141,7 +137,6 @@ const Charities = () => {
         }
       />
     </View>
-    </>
   );
 };
 
