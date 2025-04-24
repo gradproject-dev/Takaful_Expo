@@ -101,12 +101,12 @@ const Donations = () => {
       setSelectedCategory((selectedCategory) => [...selectedCategory, id]);
     }
   };
-  let filteredData = donations || [];
-
-  if (selectedCategory.length > 0) {
-    filteredData = filteredData.filter((item : {categoryId:string}) =>
+  let filteredData = donations ;
+    
+  if (selectedCategory.length > 0 && donations) {
+    filteredData = filteredData.filter((item : {categoryId: number}) =>
       selectedCategory.includes(item.categoryId.toString())
-    );
+      );
   }
   
   if (searchQuery) {

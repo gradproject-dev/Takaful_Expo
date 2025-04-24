@@ -25,7 +25,7 @@ const CategoryContainer = ({hanldeCategoryClick,selectedCategory }: props) => {
   return (
     <FlatList
         data={!isLoading && !isError && categories? categories: []}
-        renderItem={({item}) => <CategoryItem onClick={() => hanldeCategoryClick(item.id)} text={item?.name} id={item.id} highlight={selectedCategory.includes(item.id) ? true : false} />}
+        renderItem={({item}) => <CategoryItem onClick={() => hanldeCategoryClick(item.id.toString())} text={item?.name} id={item.id} highlight={selectedCategory.includes(item.id.toString()) ? true : false} />}
         keyExtractor={(item) => item.id.toString()}
         horizontal
         showsHorizontalScrollIndicator={false}
