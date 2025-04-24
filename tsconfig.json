@@ -12,6 +12,8 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts",
     "nativewind-env.d.ts",
-    "image-declaration.d.ts"
-, "utils/nofitfication.js", "utils/fetchData.js"  ]
+    "image-declaration.d.ts",
+    "utils/nofitfication.js",
+    "utils/fetchData.ts"
+  ]
 }

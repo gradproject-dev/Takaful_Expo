@@ -33,7 +33,9 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
   );
   const [description, setDescription] = useState("");
   const [quality, setQuality] = useState<number>(1);
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<
+    { uri: string; name: string; type: string }[]
+  >([]);
 
   const {
     data: categories,
@@ -66,7 +68,7 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
       files: images,
       categoryId: selectedCategoryId,
       // guests can't access the page so auth.id will always be available
-      donorId: auth!.id,
+      donorId: auth!.user.donor!.id,
     };
     setIsSubmitting(true);
     onSubmit(donationData);
@@ -91,15 +93,20 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
       allowsMultipleSelection: true,
       quality: 1,
     });
-    console.log(result);
+
     if (!result.canceled && result.assets.length > 0) {
-      const selectedUris = result.assets.map((asset) => asset.uri);
-      setImages((prev) => [...prev, ...selectedUris]);
+      const selected = result.assets.map((asset, index) => ({
+        uri: asset.uri,
+        name: asset.fileName ?? `image_${Date.now()}_${index}.jpg`,
+        type: asset.type ?? "image/jpeg",
+      }));
+
+      setImages((prev) => [...prev, ...selected]);
     }
   };
 
   const removeImage = (uri: string) => {
-    setImages((prev) => prev.filter((img) => img !== uri));
+    setImages((prev) => prev.filter((img) => img.uri !== uri));
   };
 
   return (
@@ -134,15 +141,15 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
               showsHorizontalScrollIndicator={false}
               className="my-2"
             >
-              {images.map((uri) => (
-                <View key={uri} className="mr-2 relative">
+              {images.map((img) => (
+                <View key={img.uri} className="mr-2 relative">
                   <Image
-                    source={{ uri }}
+                    source={{ uri: img.uri }}
                     className="w-24 h-24 rounded-md"
                     resizeMode="cover"
                   />
                   <TouchableOpacity
-                    onPress={() => removeImage(uri)}
+                    onPress={() => removeImage(img.uri)}
                     className="absolute top-0 right-0 bg-red-600 rounded-full p-1"
                   >
                     <Text className="text-white text-xs font-bold">X</Text>

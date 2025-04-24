@@ -40,7 +40,7 @@ export function useRegisterPushToken() {
         await fetch(`${BACKENDURL}/notifications/register-token`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ userId: auth.id, token }),
+          body: JSON.stringify({ userId: auth.user.id, token }),
         });
       } catch (error) {
         console.error("Error getting or sending token:", error);

@@ -27,18 +27,19 @@ const ItemSeparator = () => <View style={{ height: 10 }} />;
 
 const Profile = () => {
   const { auth } = useAuth();
+  console.log(auth);
   const [showForm, setShowForm] = useState(false);
   const { mutateAsync } = useMutation({
-    mutationFn: (donationData: CreateDonationDto) => {
+    mutationFn: async (donationData: CreateDonationDto) => {
       console.log("donationData", donationData);
-      return createDonation(`${BACKENDURL}/donation`, donationData);
+      return await createDonation(`${BACKENDURL}/donation`, donationData);
     },
     onSuccess: () => {
       console.log("Donation added successfully");
       setShowForm(false);
     },
     onError: (error) => {
-     // console.error("Error adding donation:", error);
+      // console.error("Error adding donation:", error);
     },
   });
   const user = {
@@ -48,7 +49,7 @@ const Profile = () => {
   };
 
   const handleAddDonation = async (donation: CreateDonationDto) => {
-   await  mutateAsync(donation);
+    await mutateAsync(donation);
   };
 
   let content = undefined;
@@ -72,16 +73,15 @@ const Profile = () => {
   }
   if (auth) {
     let insideContent = undefined;
-    const { id: userId } = auth;
+    const donorId = auth.user.donor!.id;
     const {
       data: donations,
       isLoading,
       isError,
       error,
     } = useQuery({
-      queryKey: ["donations", userId],
-      queryFn: () =>
-        fetchData(`${BACKENDURL}/donation/all`, { donorId: userId }),
+      queryKey: ["donations", donorId],
+      queryFn: () => fetchData(`${BACKENDURL}/donation/all`, { donorId }),
       staleTime: 1000 * 2,
     });
     if (isLoading) {

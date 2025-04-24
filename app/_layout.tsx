@@ -24,18 +24,22 @@ const queryClient = new QueryClient();
 // });
 
 export default function RootLayout() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <JWTProvider>
-        <NotificationContext />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Auth/index" />
-          <Stack.Screen name="(main)" />
-          <Stack.Screen name="EventDetails/[id]" />
-          <Stack.Screen name="itemDetails/[id]/" />
-          <Stack.Screen name="CharityDetails/[id]/" />
-        </Stack>
-      </JWTProvider>
-    </QueryClientProvider>
-  );
+  try {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <JWTProvider>
+          <NotificationContext />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="Auth/index" />
+            <Stack.Screen name="(main)" />
+            <Stack.Screen name="EventDetails/[id]" />
+            <Stack.Screen name="itemDetails/[id]/" />
+            <Stack.Screen name="CharityDetails/[id]/" />
+          </Stack>
+        </JWTProvider>
+      </QueryClientProvider>
+    );
+  } catch (error) {
+    console.log(error);
+  }
 }
