@@ -105,13 +105,13 @@ const Donations = () => {
     
   if (selectedCategory.length > 0 && donations) {
     filteredData = filteredData.filter((item : {categoryId: number}) =>
-      selectedCategory.includes(item.categoryId.toString())
-      );
+      selectedCategory.includes(item.categoryId.toString()), 2000) 
+      
   }
   
   if (searchQuery) {
     filteredData = filteredData.filter((item:{name :string}) =>
-      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+   item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }
   return (

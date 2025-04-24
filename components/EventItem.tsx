@@ -31,13 +31,13 @@ const EventItme = ({
   const handleEvent = () => router.push(`/EventDetails/${id}`);
   return (
     <Custombutton
-      buttonStyles="bg-white flex-row rounded-xl h-36"
+      buttonStyles="bg-white flex-row rounded-xl h-36 gap-2"
       handlePress={handleEvent}
     >
       <View className="flex-1">
         <Image
           source={{ uri: image }}
-          className=" w-full h-full rounded-xl object-cover"
+          className=" w-full h-full rounded-xl object-cover rounded-tr-none rounded-br-none "
         />
       </View>
       <View className="flex-[1.8] items-center p-2 gap-1 justify-between">

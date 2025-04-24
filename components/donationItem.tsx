@@ -30,13 +30,13 @@ const DonationItem = ({
   };
   return (
     <Custombutton
-      buttonStyles="bg-white flex-row rounded-xl  h-36" 
+      buttonStyles="bg-white flex-row rounded-xl  h-36 gap-2" 
       handlePress={handleEvent}
     >   
         <View className="flex-1">
         <Image
           source={clothes}
-          className=" w-full h-full  rounded-xl object-cover "
+          className=" w-full h-full  rounded-xl object-cover rounded-tr-none rounded-br-none "
         />
         </View>
       <View className=" items-center p-2 justify-between flex-[1.9] gap-1 ">

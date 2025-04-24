@@ -1,12 +1,13 @@
 //Get data from API
-export default async function fetchData(url,  { searchTerm ,  id } = {}) {
+export default async function fetchData(url,  { donorId ,  id } = {}) {
   if (id) url += `?id=${id}`;
-  else if (searchTerm) url += `?search=${searchTerm}`;
+   if (donorId) url += `?donorId=${donorId}`;
   try {
     console.log(url);
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error("Network response was not ok");
+      const errorMessage = await response.text();
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -15,14 +16,6 @@ export default async function fetchData(url,  { searchTerm ,  id } = {}) {
     throw new Error("Error fetching data: " + error.message);
   }
 }
-
-
-const fetchByCategories = async (url , categories) => {
-  const res = await fetch(`${url}?categories=${categories.join(',')}`);
-  if (!res.ok) throw new Error('Failed to fetch');
-  return res.json();
-}
-
 
 // Post data to API
 export async function postData(url, data) {
@@ -46,14 +39,17 @@ export async function postData(url, data) {
 
 export async function createDonor(url, data) {
   const formData = new FormData();
-
   for (const key in data) {
-    formData.append(key, data[key]);
+    const value = data[key];
+    if (Array.isArray(value)) {
+      value.forEach((v) => formData.append(`${key}[]`, v)); // use key[] for arrays
+    } else if (value !== null && value !== undefined) {
+      formData.append(key, value.toString());
+    }
   }
   try {
     const response = await fetch(url, {
       method: "POST",
-
       body: formData,
     });
     console.log(response);
