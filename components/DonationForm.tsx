@@ -91,7 +91,7 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
       allowsMultipleSelection: true,
       quality: 1,
     });
-
+    console.log(result);
     if (!result.canceled && result.assets.length > 0) {
       const selectedUris = result.assets.map((asset) => asset.uri);
       setImages((prev) => [...prev, ...selectedUris]);

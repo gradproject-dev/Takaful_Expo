@@ -3,7 +3,6 @@ export default async function fetchData(url,  { donorId ,  id } = {}) {
   if (id) url += `?id=${id}`;
    if (donorId) url += `?donorId=${donorId}`;
   try {
-    console.log(url);
     const response = await fetch(url);
     if (!response.ok) {
       const errorMessage = await response.text();
@@ -41,11 +40,7 @@ export async function createDonor(url, data) {
   const formData = new FormData();
   for (const key in data) {
     const value = data[key];
-    if (Array.isArray(value)) {
-      value.forEach((v) => formData.append(`${key}[]`, v)); // use key[] for arrays
-    } else if (value !== null && value !== undefined) {
-      formData.append(key, value.toString());
-    }
+    formData.append(key, value);
   }
   try {
     const response = await fetch(url, {
@@ -62,4 +57,51 @@ export async function createDonor(url, data) {
     console.log(error);
     throw new Error("Error posting data: " + error.message);
   }
+}
+export async function createDonation(url, data) {
+  Object.entries(data).forEach(([key, value]) => {
+    if (key !== 'files') {
+      formData.append(key, String(value));
+    }
+  });
+  
+  // Correctly append multiple files
+  data.files.forEach((file, index) => {
+    formData.append('files', {
+      uri: file.uri,
+      name: file.fileName ?? `image_${index}.jpg`,
+      type: file.type ?? 'image/jpeg',
+    });
+  });
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData,
+    });
+    if (!response.ok) {
+      console.log(await response.text());
+      throw new Error("Network response was not ok");
+    }
+    const result = await response.json();
+    console.log(result) 
+    return result;
+  } catch (error) {
+    console.log(error)
+    throw new Error("Error posting data: " + error.message);
+  }
+}
+// type FileLike = {
+//   uri: string;
+//   name: string;
+//   type: string;
+// };
+
+function isFile(value) {
+  return (
+    value &&
+    typeof value === 'object' &&
+    typeof value.uri === 'string' &&
+    typeof value.name === 'string' &&
+    typeof value.type === 'string'
+  );
 }

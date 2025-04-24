@@ -18,7 +18,7 @@ import itemImage from "@/assets/images/item.png";
 import AddDonationForm from "@/components/DonationForm";
 import Custombutton from "@/components/Button";
 import { useQuery } from "@tanstack/react-query";
-import fetchData, { createDonor } from "@/utils/fetchData";
+import fetchData, { createDonation, createDonor } from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import { CreateDonationDto } from "@/types/donation.dto";
@@ -28,17 +28,17 @@ const ItemSeparator = () => <View style={{ height: 10 }} />;
 const Profile = () => {
   const { auth } = useAuth();
   const [showForm, setShowForm] = useState(false);
-  const { mutate } = useMutation({
+  const { mutateAsync } = useMutation({
     mutationFn: (donationData: CreateDonationDto) => {
       console.log("donationData", donationData);
-      return createDonor(`${BACKENDURL}/donation`, donationData);
+      return createDonation(`${BACKENDURL}/donation`, donationData);
     },
     onSuccess: () => {
       console.log("Donation added successfully");
       setShowForm(false);
     },
     onError: (error) => {
-      console.error("Error adding donation:", error);
+     // console.error("Error adding donation:", error);
     },
   });
   const user = {
@@ -47,7 +47,9 @@ const Profile = () => {
     volunteerCount: 7,
   };
 
-  const handleAddDonation = (donation: CreateDonationDto) => {};
+  const handleAddDonation = async (donation: CreateDonationDto) => {
+   await  mutateAsync(donation);
+  };
 
   let content = undefined;
   if (!auth) {
@@ -140,8 +142,8 @@ const Profile = () => {
             <AddDonationForm
               visible={showForm}
               onClose={() => setShowForm(false)}
-              onSubmit={() => {
-                handleAddDonation;
+              onSubmit={(donationData) => {
+                handleAddDonation(donationData);
               }}
             />
           )}
@@ -168,7 +170,6 @@ const Profile = () => {
             <View className="h-0.5 bg-gray-300 mx-2 " />
             <View className="w-full mx-2  mt-4 flex-row items-center justify-between mb-4">
               <Text className="text-xl font-bold ">Posted Donations</Text>
-              <Text className="text-blue-500">See All</Text>
               <Custombutton
                 buttonStyles="bg-blue-500  rounded-full shadow-lg mr-5"
                 handlePress={() => setShowForm(true)}
@@ -183,7 +184,6 @@ const Profile = () => {
         </>
       );
     }
-    console.log("auth", auth);
     return content;
   }
 };

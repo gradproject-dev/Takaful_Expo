@@ -47,7 +47,6 @@ export function JWTProvider({ children }: PropsWithChildren) {
       value={{
         signIn: (token: Auth) => {
           setJWT(JSON.stringify(token));
-          console.log(token);
         },
         signOut: () => {
           setJWT(null);
