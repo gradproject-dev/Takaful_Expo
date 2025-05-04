@@ -29,7 +29,6 @@ const EventDetails = () => {
   const [loadingEvent, setLoadingEvent] = useState(true);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
-
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
 
@@ -44,20 +43,22 @@ const EventDetails = () => {
         setLoadingEvent(false);
       }
     };
-
     fetchEvent();
   }, [eventId]);
 
   useEffect(() => {
     const fetchVolunteerStatus = async () => {
-      if (!donorId) return;
+      if (!donorId) {
+        setLoadingStatus(false);
+        return;
+      }
       try {
         const response = await fetch(
           `${BACKENDURL}/volunteer/check?donorId=${donorId}&eventId=${eventId}`
         );
         const data = await response.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setVolunteerStatus(data[0]);
+        if (Array.isArray(data)) {
+          setVolunteerStatus(data.length > 0 ? data[0] : null);
         }
       } catch (error) {
         console.error("Error fetching volunteer status:", error);
@@ -65,11 +66,10 @@ const EventDetails = () => {
         setLoadingStatus(false);
       }
     };
-
     fetchVolunteerStatus();
   }, [donorId, eventId]);
 
-  const showToastMessage = (message: string, duration = 3000) => {
+  const showToastMessage = (message, duration = 3000) => {
     setToastMessage(message);
     setShowToast(true);
     setTimeout(() => setShowToast(false), duration);
@@ -82,9 +82,7 @@ const EventDetails = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ donorId, eventId, status: "IDLE" }),
       });
-
       if (!response.ok) throw new Error("Failed to volunteer");
-
       const data = await response.json();
       setVolunteerStatus(data);
       setModalVisible(false);
@@ -105,16 +103,13 @@ const EventDetails = () => {
         </View>
       );
     }
-
     if (volunteerStatus) {
-      //@ts-ignore
       const status = volunteerStatus.status;
       const isRejected = status === "REJECTED";
       const color = isRejected
         ? "border-red-500 text-red-600"
         : "border-green-500 text-green-600";
       const bg = isRejected ? "bg-red-50" : "bg-green-50";
-
       return (
         <View
           className={`mt-8 px-4 py-3 rounded-xl border ${color} ${bg} w-full`}
@@ -125,7 +120,6 @@ const EventDetails = () => {
         </View>
       );
     }
-
     return (
       <Custombutton
         buttonStyles="w-full h-14 bg-blue-500 justify-center rounded-2xl mt-8"
@@ -140,11 +134,10 @@ const EventDetails = () => {
 
   const renderModal = () => {
     if (!donorId || volunteerStatus) return null;
-
     return (
       <Modal
         animationType="fade"
-        transparent={true}
+        transparent
         visible={modalVisible}
         onRequestClose={() => setModalVisible(false)}
       >
@@ -204,7 +197,6 @@ const EventDetails = () => {
 
   return (
     <View className="flex-1 my-20 mx-5 items-center justify-around relative">
-      {/* ✅ Custom Toast */}
       {showToast && (
         <View className="absolute top-10 z-50 w-[90%] bg-black/80 py-2 px-4 rounded-xl self-center">
           <Text className="text-white text-center text-xl">{toastMessage}</Text>
@@ -217,11 +209,9 @@ const EventDetails = () => {
         </Text>
         <Image
           source={{ uri: imgsUrl[0] }}
-          // resizeMode=""
           className="h-[250px] w-full mt-4 rounded-3xl"
         />
         <View className="flex-row items-center w-[80%] rounded-full py-2 justify-evenly mt-4 bg-[#dad7d7]">
-          {/* @ts-ignore */}
           <InfoItem img={charity.imgUrl} text={charity.name} />
           <InfoItem img={donations} text={volunteers.length} />
           <InfoItem img={dateImage} text={formatDate(date)} />
@@ -250,7 +240,6 @@ const EventDetails = () => {
   );
 };
 
-//@ts-ignore
 const InfoItem = ({ img, text }) => (
   <View className="flex-row items-center">
     <Image
