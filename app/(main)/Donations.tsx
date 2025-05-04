@@ -11,7 +11,6 @@ import { useAuth } from "@/contexts/authContext";
 const ItemSeparator = () => <View style={{ height: 10 }} />;
 
 const Donations = () => {
-  const { auth } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -49,6 +48,7 @@ const Donations = () => {
       item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }
+   
   return (
     <View className="flex-1 my-24 mx-4 gap-5 items-center">
       <FlatList
@@ -61,7 +61,7 @@ const Donations = () => {
             description={item?.description}
             rating={item.quality}
             donor={item.donor.name}
-            catigroy={item.category.name}
+            category={item.category.name}
             image={item.imgsUrl}
           />
         )}

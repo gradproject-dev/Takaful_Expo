@@ -35,6 +35,7 @@ export default function RootLayout() {
             <Stack.Screen name="EventDetails/[id]" />
             <Stack.Screen name="itemDetails/[id]/" />
             <Stack.Screen name="CharityDetails/[id]/" />
+            <Stack.Screen name="MainPage" />
           </Stack>
         </JWTProvider>
       </QueryClientProvider>
