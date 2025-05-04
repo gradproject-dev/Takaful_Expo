@@ -20,6 +20,8 @@ export type Donor = {
   deletedAt?: Date | null;
   user: User;
   volunteers?: Volunteer[];
+  lat?: string;
+  lng?: string;
   transactions?: Transaction[];
 };
 

@@ -17,7 +17,6 @@ import { BACKENDURL } from "@/constants";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import PhoneInput from "react-native-phone-number-input";
-import * as LocationGeocoding from "expo-location";
 import { Auth } from "./types";
 
 const SignupDonor = () => {
@@ -31,24 +30,27 @@ const SignupDonor = () => {
     phone: "",
     password: "",
     confirmpassword: "",
-    address: "",
   });
 
-  const { mutate: login, isPending: isLoading } = useMutation({
+  const {
+    mutate: login,
+    isPending: isLoading,
+    isError,
+  } = useMutation({
     mutationFn: () =>
       postData(`${BACKENDURL}/auth/sign-in`, {
         email: formData.email,
         password: formData.password,
       }),
     onSuccess: (data: Auth) => {
-      signIn(data);
+      signIn(data); // Save parsed Auth object to storage
     },
   });
-
   const [coordinates, setCoordinates] = useState<{
     lat: number;
     lng: number;
   } | null>(null);
+
   const [locationLoading, setLocationLoading] = useState(false);
 
   const { mutate, isPending } = useMutation({
@@ -63,33 +65,18 @@ const SignupDonor = () => {
         lng,
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       login();
       router.replace("/(main)/Events");
     },
   });
 
-  const reverseGeocode = async (lat: number, lng: number) => {
-    try {
-      const result = await LocationGeocoding.reverseGeocodeAsync({
-        latitude: lat,
-        longitude: lng,
-      });
-      if (result.length > 0) {
-        const { street, name, city, region, country } = result[0];
-        const addressString = `${name || street || ""}, ${
-          city || region || ""
-        }, ${country || ""}`;
-        setFormData((prev) => ({ ...prev, address: addressString }));
-      }
-    } catch (error) {
-      console.warn("Failed to reverse geocode location", error);
-    }
-  };
-
   const onChangeFunction = (text: string, fieldName: string) => {
     const field = fieldName.toLowerCase();
-    setFormData((prev) => ({ ...prev, [field]: text.trimStart() }));
+    setFormData((prev) => ({
+      ...prev,
+      [field]: text.trimStart(),
+    }));
   };
 
   const handleSubmit = () => {
@@ -114,6 +101,7 @@ const SignupDonor = () => {
     mutate();
   };
 
+  // Auto-fetch location on mount
   useEffect(() => {
     (async () => {
       try {
@@ -127,7 +115,6 @@ const SignupDonor = () => {
         const { latitude, longitude } = loc.coords;
         const newCoords = { lat: latitude, lng: longitude };
         setCoordinates(newCoords);
-        reverseGeocode(latitude, longitude);
         mapRef.current?.animateToRegion({
           latitude,
           longitude,
@@ -149,7 +136,6 @@ const SignupDonor = () => {
       const { latitude, longitude } = loc.coords;
       const newCoords = { lat: latitude, lng: longitude };
       setCoordinates(newCoords);
-      reverseGeocode(latitude, longitude);
       mapRef.current?.animateToRegion({
         latitude,
         longitude,
@@ -183,7 +169,6 @@ const SignupDonor = () => {
         paddingHorizontal: 26,
         paddingBottom: 50,
       }}
-      keyboardShouldPersistTaps="handled"
     >
       <Text className="text-5xl font-bold text-[#094067] text-center mb-10">
         Join Us as a Donor
@@ -199,9 +184,12 @@ const SignupDonor = () => {
           defaultValue={formData.phone}
           defaultCode="JO"
           layout="first"
-          onChangeFormattedText={(text) =>
-            setFormData((prev) => ({ ...prev, phone: text }))
-          }
+          onChangeFormattedText={(text) => {
+            setFormData((prev) => ({
+              ...prev,
+              phone: text,
+            }));
+          }}
           containerStyle={{
             width: "100%",
             height: 48,
@@ -214,16 +202,47 @@ const SignupDonor = () => {
             backgroundColor: "white",
             borderTopRightRadius: 12,
             borderBottomRightRadius: 12,
+            paddingVertical: 0,
+            paddingHorizontal: 0,
           }}
-          textInputStyle={{ fontSize: 20, color: "#000" }}
-          codeTextStyle={{ fontSize: 18, color: "#000" }}
+          textInputStyle={{
+            fontSize: 20,
+            paddingVertical: 0,
+            paddingHorizontal: 0,
+            marginTop: 1,
+            height: 48,
+            color: "#000",
+          }}
+          codeTextStyle={{
+            fontSize: 18,
+            color: "#000",
+            paddingHorizontal: 0,
+          }}
+          flagButtonStyle={{
+            marginLeft: 8,
+            marginRight: 4,
+          }}
+          countryPickerButtonStyle={{
+            paddingLeft: 8,
+          }}
+          textInputProps={{
+            maxLength: 15, // <-- You can adjust this
+            keyboardType: "phone-pad",
+          }}
+          withShadow={false}
+          withDarkTheme={false}
+          disableArrowIcon={false}
         />
       </View>
 
-      <Input label="Password" secureTextEntry onChangeFn={onChangeFunction} />
+      <Input
+        label="Password"
+        secureTextEntry={true}
+        onChangeFn={onChangeFunction}
+      />
       <Input
         label="ConfirmPassword"
-        secureTextEntry
+        secureTextEntry={true}
         onChangeFn={onChangeFunction}
       />
 
@@ -241,7 +260,6 @@ const SignupDonor = () => {
             onPress={(e) => {
               const { latitude, longitude } = e.nativeEvent.coordinate;
               setCoordinates({ lat: latitude, lng: longitude });
-              reverseGeocode(latitude, longitude);
             }}
           >
             <Marker
@@ -253,12 +271,6 @@ const SignupDonor = () => {
           </MapView>
         </View>
       )}
-
-      {formData.address ? (
-        <Text style={{ marginTop: 10, fontSize: 16, color: "gray" }}>
-          📍 {formData.address}
-        </Text>
-      ) : null}
 
       <Button
         title={locationLoading ? "Relocating..." : "Relocate to My Location"}

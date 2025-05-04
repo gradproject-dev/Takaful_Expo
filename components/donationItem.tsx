@@ -13,8 +13,8 @@ interface Props {
   category: string;
   itemName: string;
   rating: number;
-  lng: string;
-  lat: string;
+  lng?: string;
+  lat?: string;
 }
 
 const DonationItem = ({

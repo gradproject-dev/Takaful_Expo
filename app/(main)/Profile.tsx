@@ -18,12 +18,11 @@ import Custombutton from "@/components/Button";
 import fetchData, { createDonation } from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
 import { CreateDonationDto } from "@/types/donation.dto";
-
 const ItemSeparator = () => <View style={{ height: 10 }} />;
 
 const Profile = () => {
   const { auth } = useAuth();
-  const donorId = auth?.user?.donor?.id
+  const donorId = auth?.user?.donor?.id;
   const [showForm, setShowForm] = useState(false);
 
   const { mutateAsync } = useMutation({
@@ -45,7 +44,6 @@ const Profile = () => {
     enabled: !!donorId,
     staleTime: 1000 * 2,
   });
-
 
   const handleAddDonation = async (donation: CreateDonationDto) => {
     await mutateAsync(donation);
@@ -69,7 +67,7 @@ const Profile = () => {
       </View>
     );
   }
-  
+
   const renderDonations = () => {
     if (isLoading) {
       return (
@@ -120,6 +118,8 @@ const Profile = () => {
             donor={item.donor.name}
             category={item.category.name}
             image={item.imgsUrl}
+            lat={auth?.user?.donor?.lat}
+            lng={auth?.user?.donor?.lng}
           />
         )}
       />
@@ -164,9 +164,7 @@ const Profile = () => {
             buttonStyles="bg-blue-500 rounded-full shadow-lg mr-5"
             handlePress={() => setShowForm(true)}
           >
-            <Text className="text-md text-white py-2 px-4 rounded-xl">
-              Add
-            </Text>
+            <Text className="text-md text-white py-2 px-4 rounded-xl">Add</Text>
           </Custombutton>
         </View>
         {renderDonations()}
