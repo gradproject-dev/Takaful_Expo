@@ -38,7 +38,7 @@ const Login = () => {
   if (isLoading) return <Text>replace this text with a splash screen</Text>;
   if (auth?.token) return <Redirect href="/(main)/Events" />;
 
-  const handleCreateAccount = () => router.push("/Auth/Signup");
+  const handleCreateAccount = () => router.push("/Auth/SignupDonor");
   const handleSkip = () => router.push("/(main)/Events");
 
   const onChangeFunction = (text: string, field: string) => {

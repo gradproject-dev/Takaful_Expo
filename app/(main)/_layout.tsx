@@ -1,4 +1,4 @@
-import { View, Image, ImageSourcePropType , Text} from "react-native";
+import { View, Image, ImageSourcePropType, Text } from "react-native";
 import React from "react";
 import { Tabs } from "expo-router";
 import { useJWT } from "@/contexts/authContext";
@@ -13,7 +13,6 @@ type TabIconProps = {
   iconSource: ImageSourcePropType;
 };
 const TabIcon = ({ title, focused, iconSource }: TabIconProps) => {
-
   return (
     <View className="items-center justify-center mt-4">
       <Image
@@ -35,10 +34,8 @@ const _Layout = () => {
         tabBarShowLabel: false,
         headerShown: false,
         tabBarItemStyle: {
-         
           justifyContent: "center",
           alignItems: "center",
-
         },
         tabBarStyle: {
           backgroundColor: "#3DA9FC",
@@ -53,7 +50,6 @@ const _Layout = () => {
       }}
     >
       <Tabs.Screen
-      
         name="Events/index"
         options={{
           title: "Events/index",
@@ -83,11 +79,15 @@ const _Layout = () => {
           title: "charity",
           headerShown: false,
           tabBarIcon: ({ focused }: { focused: boolean }) => (
-            <TabIcon title="charity" focused={focused} iconSource={charityIcon} />
+            <TabIcon
+              title="charity"
+              focused={focused}
+              iconSource={charityIcon}
+            />
           ),
         }}
       />
-     <Tabs.Screen
+      <Tabs.Screen
         name="Profile"
         options={{
           title: "profile",
@@ -101,7 +101,6 @@ const _Layout = () => {
           ),
         }}
       />
-       
     </Tabs>
   );
 };

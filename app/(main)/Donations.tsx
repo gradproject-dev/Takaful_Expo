@@ -7,78 +7,11 @@ import { useQuery } from "@tanstack/react-query";
 import fetchData from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
 import { useAuth } from "@/contexts/authContext";
-import Sign from "@/components/Sign";
-const data = [
-  {
-    id: Math.random(),
-    itemName: "jeans",
-    donor: "Mahde Abuhasan",
-    catigroy: "clothes",
-    rating: 4.5,
-    description: "3 old jeans blue and black ",
-  },
-  {
-    id: Math.random(),
-    itemName: "jeans",
-    donor: "Mahde Abuhasan",
-    catigroy: "clothes",
-    rating: 4.5,
 
-    description: "3 old jeans blue and black",
-  },
-  {
-    id: Math.random(),
-    itemName: "jeans",
-    donor: "Mahde Abuhasan",
-    catigroy: "clothes",
-    rating: 4.5,
-
-    description: "3 old jeans blue and black",
-  },
-  {
-    id: Math.random(),
-    itemName: "jeans",
-    donor: "Mahde Abuhasan",
-    catigroy: "clothes",
-    rating: 4.5,
-
-    description: "3 old jeans blue and black",
-  },
-  {
-    id: Math.random(),
-    itemName: "jeans",
-    donor: "Mahde Abuhasan",
-    catigroy: "clothes",
-    rating: 4.5,
-
-    description: "3 old jeans blue and black",
-  },
-  {
-    id: Math.random(),
-    itemName: "jeans",
-    donor: "Mahde Abuhasan",
-    catigroy: "clothes",
-    rating: 4.5,
-
-    description: "3 old jeans blue and black",
-  },
-];
-const categroies = [
-  "clothes",
-  "books",
-  "food",
-  "toys",
-  "stationary",
-  "others",
-  "All",
-];
-
-const ItemSeparator = () => (
-  <View style={{ height: 10 }} /> 
-);
+const ItemSeparator = () => <View style={{ height: 10 }} />;
 
 const Donations = () => {
-  const {auth} = useAuth();
+  const { auth } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -101,24 +34,25 @@ const Donations = () => {
       setSelectedCategory((selectedCategory) => [...selectedCategory, id]);
     }
   };
-  let filteredData = donations ;
-    
+  let filteredData = donations;
+
   if (selectedCategory.length > 0 && donations) {
-    filteredData = filteredData.filter((item : {categoryId: number}) =>
-      selectedCategory.includes(item.categoryId.toString()), 2000) 
-      
+    filteredData = filteredData.filter(
+      (item: { categoryId: number }) =>
+        selectedCategory.includes(item.categoryId.toString()),
+      2000
+    );
   }
-  
+
   if (searchQuery) {
-    filteredData = filteredData.filter((item:{name :string}) =>
-   item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    filteredData = filteredData.filter((item: { name: string }) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }
   return (
- 
     <View className="flex-1 my-24 mx-4 gap-5 items-center">
       <FlatList
-        data={ !isPending && !isError ? filteredData : []  }
+        data={!isPending && !isError ? filteredData : []}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <DonationItem
@@ -140,8 +74,15 @@ const Donations = () => {
             <Text className="text-5xl font-bold text-center text-[#094067] mb-6">
               Donations
             </Text>
-            <SearchBar placeholder="Search" onChangeText={setSearchQuery} value={searchQuery}/>
-            <CategoryContainer hanldeCategoryClick={handleClick} selectedCategory={selectedCategory}/>
+            <SearchBar
+              placeholder="Search"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+            />
+            <CategoryContainer
+              hanldeCategoryClick={handleClick}
+              selectedCategory={selectedCategory}
+            />
             {isPending && (
               <View className="flex-1 items-center justify-center mt-10">
                 <ActivityIndicator size="large" color="blue" />

@@ -73,8 +73,8 @@ const ItemSeparator = () => (
 );
 
 const Charities = () => {
-   const { auth } = useAuth();
-   const [searchQuery, setSearchQuery] = useState("");
+  const { auth } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const {
     data: charities,
@@ -86,21 +86,23 @@ const Charities = () => {
     staleTime: 1000 * 15, //15 seconds
     gcTime: 1000 * 60 * 5, //5 minutes
   });
+  console.log(charities);
 
-  let  filteredData= charities;
+  let filteredData = charities;
   if (searchQuery && charities) {
-    filteredData = charities.filter((event: {name:string}) =>
+    filteredData = charities.filter((event: { name: string }) =>
       event.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }
 
-  return (  
-  
+  return (
     <View className="flex-1 my-24 mx-4 gap-5 items-center">
       <FlatList
-        data={!isLoading && !isError ? filteredData: []}
+        data={!isLoading && !isError ? filteredData : []}
         keyExtractor={(charity) => charity.id.toString()}
-        renderItem={({ item: charity }) => <CharityItem id= {charity.id.toString()} imgUrl={charity.imgUrl} />}
+        renderItem={({ item: charity }) => (
+          <CharityItem id={charity.id.toString()} imgUrl={charity.imgUrl} />
+        )}
         columnWrapperStyle={{
           display: "flex",
           justifyContent: "space-around",
@@ -121,7 +123,11 @@ const Charities = () => {
             <Text className="text-5xl font-bold text-center text-[#094067] mb-6">
               Charities
             </Text>
-            <SearchBar placeholder="Search" onChangeText={setSearchQuery} value={searchQuery}/>
+            <SearchBar
+              placeholder="Search"
+              onChangeText={setSearchQuery}
+              value={searchQuery}
+            />
             {isLoading && (
               <View className="flex-1 items-center justify-center mt-10">
                 <ActivityIndicator size="large" color="#4fa94d" />
