@@ -74,7 +74,7 @@ export async function createDonor<T = any>(
   data: Record<string, string | FileLike>
 ): Promise<T> {
   const formData = new FormData();
-
+  console.log(data);
   for (const key in data) {
     const value = data[key];
     formData.append(key, value as string);
@@ -87,6 +87,8 @@ export async function createDonor<T = any>(
     });
 
     if (!response.ok) {
+      console.log(await response.json());
+      console.log(response);
       throw new Error("Network response was not ok");
     }
 

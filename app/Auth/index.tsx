@@ -36,10 +36,10 @@ const Login = () => {
   };
 
   if (isLoading) return <Text>replace this text with a splash screen</Text>;
-  if (auth?.token) return <Redirect href="/(main)/Events" />;
+  if (auth?.token) return <Redirect href="/MainPage" />;
 
   const handleCreateAccount = () => router.push("/Auth/SignupDonor");
-  const handleSkip = () => router.push("/(main)/Events");
+  const handleSkip = () => router.push("/MainPage");
 
   const onChangeFunction = (text: string, field: string) => {
     if (field === "Email") setEmail(text);
@@ -51,6 +51,7 @@ const Login = () => {
       <Custombutton
         handlePress={handleSkip}
         buttonStyles="absolute top-14 right-8 z-10"
+        disabled={isPending}
       >
         <Text className="text-md text-white bg-blue-500 py-2 px-4 rounded-xl">
           Skip
@@ -70,6 +71,7 @@ const Login = () => {
           label="Email"
           onChangeFn={onChangeFunction}
           value={email}
+          disabled={isPending}
         />
         <Input
           placeholder="Enter Your Password Please"
@@ -77,10 +79,12 @@ const Login = () => {
           onChangeFn={onChangeFunction}
           value={password}
           secureTextEntry={true}
+          disabled={isPending}
         />
         <Custombutton
           buttonStyles="flex-row justify-end w-full relative bottom-4"
           handlePress={() => router.push("/")}
+          disabled={isPending}
         >
           <Text className="font-bold text-blue-500">Forgot Password?</Text>
         </Custombutton>
@@ -95,6 +99,7 @@ const Login = () => {
       <Custombutton
         buttonStyles="w-full h-14 bg-blue-500 justify-center rounded-2xl mt-10"
         handlePress={handleSubmit}
+        disabled={isPending}
       >
         {isPending ? (
           <View className="flex-row items-center justify-center w-full gap-2">
@@ -112,7 +117,7 @@ const Login = () => {
 
       <View className="mt-8 items-center">
         <Text>Don't have an account?</Text>
-        <Custombutton handlePress={handleCreateAccount}>
+        <Custombutton handlePress={handleCreateAccount} disabled={isPending}>
           <Text className="underline">Create One</Text>
         </Custombutton>
       </View>

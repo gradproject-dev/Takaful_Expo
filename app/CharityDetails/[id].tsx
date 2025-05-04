@@ -1,12 +1,22 @@
 import { useLocalSearchParams } from "expo-router";
-import React from "react";
-import { ActivityIndicator, FlatList, Text, View, Image } from "react-native";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Linking,
+  Modal,
+  TextInput,
+  Pressable,
+} from "react-native";
 import { useQuery } from "@tanstack/react-query";
 
 import { BACKENDURL } from "@/constants";
 import fetchData from "@/utils/fetchData";
 import EventItem from "@/components/EventItem";
-import DonateButton from "@/components/DonateButton";
 
 const ItemSeparator = () => <View style={{ height: 10 }} />;
 
@@ -24,6 +34,12 @@ const CharityPage = () => {
   });
 
   const charity = charityArray?.[0];
+
+  // Modal state
+  const [donateModalVisible, setDonateModalVisible] = useState(false);
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardType, setCardType] = useState("VISA");
+  const [ccv, setCcv] = useState("");
 
   return (
     <View className="flex-1 my-16 mx-5 items-center justify-around">
@@ -62,39 +78,39 @@ const CharityPage = () => {
               </View>
 
               {charity?.canReceiveFunds && (
-                <View className="ml-2">
-                  <DonateButton
-                    donorId={9} // you should replace this with the actual logged-in donorId
-                    charityId={charity.id}
-                    amount={100} // or allow user input
-                    paymentMethod="VISA" // or allow user choice
-                  />
-                </View>
+                <TouchableOpacity
+                  onPress={() => setDonateModalVisible(true)}
+                  className="bg-green-500 px-4 py-2 rounded-lg"
+                >
+                  <Text className="text-white font-semibold">Donate</Text>
+                </TouchableOpacity>
               )}
             </View>
 
             {/* Charity Info */}
             <View className="space-y-2 bg-gray-100 p-4 rounded-xl">
               <Text className="text-base text-gray-700">
-                📍 Address: {charity?.address}
-              </Text>
-              <Text className="text-base text-gray-700">
                 📞 Phone: {charity?.phone}
               </Text>
               <Text className="text-base text-gray-700">
                 📧 Email: {charity?.email}
               </Text>
-              <Text className="text-base text-gray-700">
-                🏦 Can Receive Funds:{" "}
-                <Text
-                  className={
-                    charity?.canReceiveFunds ? "text-green-600" : "text-red-500"
-                  }
-                >
-                  {charity?.canReceiveFunds ? "Yes" : "No"}
-                </Text>
-              </Text>
             </View>
+
+            {/* Map Link */}
+            {charity?.lat != null && charity?.lng != null && (
+              <TouchableOpacity
+                onPress={() => {
+                  const url = `https://www.google.com/maps/search/?api=1&query=${charity.lat},${charity.lng}`;
+                  Linking.openURL(url);
+                }}
+                className="bg-blue-100 mt-5 p-3 rounded-xl"
+              >
+                <Text className="text-blue-700 font-semibold">
+                  🌍 View Location on Google Maps
+                </Text>
+              </TouchableOpacity>
+            )}
 
             {/* Section Title */}
             {charity?.events?.length > 0 ? (
@@ -121,6 +137,84 @@ const CharityPage = () => {
           </View>
         )}
       />
+
+      {/* Donate Modal */}
+      <Modal
+        visible={donateModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setDonateModalVisible(false)}
+      >
+        <View className="flex-1 justify-center items-center bg-black bg-opacity-50">
+          <View className="bg-white w-[90%] p-6 rounded-lg">
+            <Text className="text-xl font-bold mb-4">
+              Donate to {charity?.name}
+            </Text>
+
+            <TextInput
+              placeholder="Card Number"
+              keyboardType="number-pad"
+              className="border border-gray-300 rounded-lg p-2 mb-3"
+              value={cardNumber}
+              onChangeText={setCardNumber}
+            />
+
+            <Text className="mb-1">Card Type:</Text>
+            <View className="flex-row space-x-4 mb-3">
+              <TouchableOpacity onPress={() => setCardType("VISA")}>
+                <Text
+                  className={`px-3 py-1 rounded-full ${
+                    cardType === "VISA"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  VISA
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => setCardType("MASTERCARD")}>
+                <Text
+                  className={`px-3 py-1 rounded-full ${
+                    cardType === "MASTERCARD"
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  MASTERCARD
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <TextInput
+              placeholder="CCV"
+              keyboardType="number-pad"
+              className="border border-gray-300 rounded-lg p-2 mb-4"
+              value={ccv}
+              onChangeText={setCcv}
+            />
+
+            <Pressable
+              className="bg-green-600 py-3 rounded-lg"
+              onPress={() => {
+                // You can integrate real payment logic here
+                console.log("Donating with:", cardNumber, cardType, ccv);
+                setDonateModalVisible(false);
+              }}
+            >
+              <Text className="text-white text-center font-semibold">
+                Submit Donation
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => setDonateModalVisible(false)}
+              className="mt-3"
+            >
+              <Text className="text-center text-red-500">Cancel</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
