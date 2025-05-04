@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BACKENDURL } from "@/constants";
 import fetchData from "@/utils/fetchData";
 import EventItem from "@/components/EventItem";
+import DonateButton from "@/components/DonateButton";
 
 const ItemSeparator = () => <View style={{ height: 10 }} />;
 
@@ -47,20 +48,33 @@ const CharityPage = () => {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={() => (
           <View className="mb-5 w-full">
-            {/* Charity Profile Section */}
-            <View className="items-center space-y-3">
-              <Image
-                source={{ uri: charity?.imgUrl }}
-                resizeMode="cover"
-                className="h-[150px] w-[150px] rounded-full border border-gray-300"
-              />
-              <Text className="text-2xl font-bold text-[#094067]">
-                {charity?.name}
-              </Text>
+            {/* Charity Profile Header with Donate Button */}
+            <View className="flex-row justify-between items-center mb-4">
+              <View className="flex-row items-center space-x-3">
+                <Image
+                  source={{ uri: charity?.imgUrl }}
+                  resizeMode="cover"
+                  className="h-[100px] w-[100px] rounded-full border border-gray-300"
+                />
+                <Text className="text-2xl font-bold text-[#094067]">
+                  {charity?.name}
+                </Text>
+              </View>
+
+              {charity?.canReceiveFunds && (
+                <View className="ml-2">
+                  <DonateButton
+                    donorId={9} // you should replace this with the actual logged-in donorId
+                    charityId={charity.id}
+                    amount={100} // or allow user input
+                    paymentMethod="VISA" // or allow user choice
+                  />
+                </View>
+              )}
             </View>
 
             {/* Charity Info */}
-            <View className="mt-6 space-y-2 bg-gray-100 p-4 rounded-xl">
+            <View className="space-y-2 bg-gray-100 p-4 rounded-xl">
               <Text className="text-base text-gray-700">
                 📍 Address: {charity?.address}
               </Text>
