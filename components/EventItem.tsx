@@ -31,21 +31,22 @@ const EventItme = ({
   const handleEvent = () => router.push(`/EventDetails/${id}`);
   return (
     <Custombutton
-      buttonStyles="bg-white flex-row rounded-xl h-36 gap-2"
+      buttonStyles="bg-white flex-row rounded-xl h-36 gap-2 item"
       handlePress={handleEvent}
     >
-      <View className="flex-1">
+      <View className="w-1/3">
         <Image
           source={{ uri: image }}
           className=" w-full h-full rounded-xl object-cover rounded-tr-none rounded-br-none "
         />
       </View>
-      <View className="flex-[1.8] items-center p-2 gap-1 justify-between">
-        <Text className="font-bold text-2xl text-center">{name}</Text>
-        <Text className="self-start" numberOfLines={3} ellipsizeMode="tail">
+      <View className="flex-1  items-center p-2 gap-1 justify-between">
+       <View><Text className="font-bold text-2xl text-center">{name}</Text></View> 
+        <View><Text className="self-start" numberOfLines={3} ellipsizeMode="tail">
           {description}
         </Text>
-        <View className="flex-row items-center w-full justify-between">
+        </View>
+        <View className="flex-row  items-center w-full justify-between">
           <View className="flex-row items-center">
             <Image
               source={{ uri: charityImage }}

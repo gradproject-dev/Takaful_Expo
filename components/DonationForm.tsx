@@ -14,7 +14,6 @@ import * as ImagePicker from "expo-image-picker";
 import { useQuery } from "@tanstack/react-query";
 import fetchData from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
-import { FontAwesome } from "@expo/vector-icons";
 import { useAuth } from "@/contexts/authContext";
 import { CreateDonationDto } from "@/types/donation.dto";
 
@@ -24,6 +23,20 @@ interface Props {
   onSubmit: (data: CreateDonationDto) => void;
 }
 
+const qualityOptions = [
+  { label: "Excellent", value: "excellent" },
+  { label: "Good", value: "good" },
+  { label: "Fair", value: "fair" },
+  { label: "Poor", value: "poor" },
+];
+
+const qualityMap = {
+  excellent: 5,
+  good: 4,
+  fair: 3,
+  poor: 2,
+};
+
 const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
   const { auth } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,7 +45,7 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
     null
   );
   const [description, setDescription] = useState("");
-  const [quality, setQuality] = useState<number>(1);
+  const [quality, setQuality] = useState<"excellent" | "good" | "fair" | "poor">("good");
   const [images, setImages] = useState<
     { uri: string; name: string; type: string }[]
   >([]);
@@ -47,6 +60,7 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 5,
   });
+
   const handleSubmit = () => {
     if (
       !itemName.trim() ||
@@ -63,19 +77,19 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
 
     const donationData: CreateDonationDto = {
       name: itemName,
-      quality,
+      quality: qualityMap[quality],
       description,
       files: images,
       categoryId: selectedCategoryId,
-      // guests can't access the page so auth.id will always be available
       donorId: auth!.user.donor!.id,
     };
+
     setIsSubmitting(true);
     onSubmit(donationData);
     setItemName("");
     setSelectedCategoryId(null);
     setDescription("");
-    setQuality(1);
+    setQuality("good");
     setImages([]);
     onClose();
   };
@@ -110,12 +124,7 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable
         onPress={onClose}
         className="flex-1 bg-black/30 justify-center items-center"
@@ -124,9 +133,7 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
           onPress={() => {}}
           className="bg-white w-11/12 p-5 rounded-xl gap-4"
         >
-          <Text className="text-xl font-bold text-center">
-            Add New Donation
-          </Text>
+          <Text className="text-xl font-bold text-center">Add New Donation</Text>
 
           <TouchableOpacity
             onPress={pickImage}
@@ -136,11 +143,7 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
           </TouchableOpacity>
 
           {images.length > 0 && (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="my-2"
-            >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} className="my-2">
               {images.map((img) => (
                 <View key={img.uri} className="mr-2 relative">
                   <Image
@@ -175,18 +178,12 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
           />
 
           <Text className="font-semibold">Select Category:</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            className="flex-row mb-2"
-          >
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row mb-2">
             {categories?.map((cat: { id: number; name: string }) => (
               <TouchableOpacity
                 key={cat.id}
                 onPress={() =>
-                  setSelectedCategoryId((prev) =>
-                    prev === cat.id ? null : cat.id
-                  )
+                  setSelectedCategoryId((prev) => (prev === cat.id ? null : cat.id))
                 }
                 className={`px-3 py-2 rounded-md border mr-2 ${
                   selectedCategoryId === cat.id
@@ -196,9 +193,7 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
               >
                 <Text
                   className={
-                    selectedCategoryId === cat.id
-                      ? "text-white"
-                      : "text-gray-800"
+                    selectedCategoryId === cat.id ? "text-white" : "text-gray-800"
                   }
                 >
                   {cat.name}
@@ -208,20 +203,31 @@ const CreateDonationModal = ({ visible, onClose, onSubmit }: Props) => {
           </ScrollView>
 
           <Text className="font-semibold text-center">Select Quality:</Text>
-          <View className="flex-row justify-center space-x-2 mb-2">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <TouchableOpacity key={star} onPress={() => setQuality(star)}>
-                <FontAwesome
-                  name={quality >= star ? "star" : "star-o"}
-                  size={28}
-                  color={quality >= star ? "#facc15" : "#d1d5db"}
-                />
-              </TouchableOpacity>
-            ))}
+          <View className="flex-row flex-wrap justify-center gap-2 mb-2">
+            {qualityOptions.map((opt) => {
+              const isSelected = quality === opt.value;
+              return (
+                <TouchableOpacity
+                  key={opt.value}
+                  onPress={() => setQuality(opt.value as any)}
+                  className={`px-4 py-2 rounded-full ${
+                    isSelected ? "bg-blue-600" : "bg-gray-200"
+                  }`}
+                >
+                  <Text
+                    className={`font-medium ${
+                      isSelected ? "text-white" : "text-gray-800"
+                    }`}
+                  >
+                    {opt.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
           </View>
 
-          <Text className="text-center text-gray-500">
-            Selected Quality: {quality} star{quality > 1 ? "s" : ""}
+          <Text className="text-center text-gray-500 capitalize">
+            Selected Quality: {quality}
           </Text>
 
           <TouchableOpacity

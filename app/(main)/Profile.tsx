@@ -69,7 +69,6 @@ const Profile = () => {
       </View>
     );
   }
-  console.log("Auth", auth.token);
   
   const renderDonations = () => {
     if (isLoading) {
@@ -119,7 +118,7 @@ const Profile = () => {
             description={item.description}
             rating={item.quality}
             donor={item.donor.name}
-            catigroy={item.category.name}
+            category={item.category.name}
             image={item.imgsUrl}
           />
         )}
