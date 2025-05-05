@@ -66,9 +66,8 @@ const Profile = () => {
     );
   }
 
-  if (!donorId ) return null;
+  if (!donorId) return null;
 
-  
   const handleAddDonation = async (donation: CreateDonationDto) => {
     await mutateAsync(donation);
   };
