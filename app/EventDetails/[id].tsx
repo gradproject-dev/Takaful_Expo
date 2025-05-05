@@ -17,7 +17,7 @@ import { BACKENDURL } from "@/constants";
 import formatDate from "@/utils/formatDate";
 import { useAuth } from "@/contexts/authContext";
 import { EventEntity } from "@/types/allTypes";
-
+import {Volunteer} from "@/types/allTypes";
 const EventDetails = () => {
   const { id } = useLocalSearchParams();
   const { auth } = useAuth();
@@ -26,7 +26,7 @@ const EventDetails = () => {
   const donorId = auth?.user?.donor?.id || null;
 
   const [event, setEvent] = useState<EventEntity>();
-  const [volunteerStatus, setVolunteerStatus] = useState(null);
+  const [volunteerStatus, setVolunteerStatus] = useState<Volunteer |null>(null);
   const [loadingEvent, setLoadingEvent] = useState(true);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
@@ -241,7 +241,7 @@ const EventDetails = () => {
   );
 };
 
-const InfoItem = ({ img, text }) => (
+const InfoItem = ({ img, text }: {img: string , text:string}) => (
   <View className="flex-row items-center">
     <Image
       source={typeof img === "string" ? { uri: img } : img}
