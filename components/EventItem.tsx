@@ -5,7 +5,7 @@ import dateImage from "@/assets/images/date.png";
 import Custombutton from "./Button";
 import { useRouter } from "expo-router";
 import formatDate from "@/utils/formatDate";
-import { useAuth } from "@/contexts/authContext";
+
 interface props {
   name: string;
   description: string;
@@ -14,9 +14,8 @@ interface props {
   numDonations: number;
   date: string;
   image: string;
-  id: string;
+  id: number;
 }
-
 const EventItme = ({
   image,
   name,

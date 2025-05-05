@@ -6,18 +6,18 @@ import CategoryContainer from "@/components/CategoryContainer";
 import { useQuery } from "@tanstack/react-query";
 import fetchData from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
-
+import { Donation } from "@/types/allTypes";
 const ItemSeparator = () => <View style={{ height: 10 }} />;
 
 const Donations = () => {
   const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const {
     data: donations,
     isPending,
     isError,
-  } = useQuery({
+  } = useQuery<Donation[]>({
     queryKey: ["donations"],
     queryFn: () => fetchData(`${BACKENDURL}/donation/all`),
     staleTime: 1000 * 15, // 15 seconds
@@ -48,17 +48,17 @@ const Donations = () => {
       <FlatList
         data={!isPending && !isError ? filteredData : []}
         keyExtractor={(item) => item.id?.toString() ?? Math.random().toString()}
-        renderItem={({ item }) => {
+        renderItem={({ item } : {item: Donation}) => {
           if (!item?.donor || !item?.category) return null;
 
           return (
             <DonationItem
               lng={item.donor.lng ?? "0"}
               lat={item.donor.lat ?? "0"}
-              itemId={item.id.toString()}
+              itemId={item.id}
               itemName={item.name ?? "Unnamed"}
               description={item.description ?? "No description"}
-              rating={item.quality ?? 0}
+              rating={item.quality}
               donor={item.donor.name ?? "Unknown"}
               category={item.category.name ?? "Uncategorized"}
               image={item.imgsUrl ?? []}

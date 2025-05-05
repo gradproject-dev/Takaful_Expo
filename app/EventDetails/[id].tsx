@@ -16,6 +16,7 @@ import fetchData from "@/utils/fetchData";
 import { BACKENDURL } from "@/constants";
 import formatDate from "@/utils/formatDate";
 import { useAuth } from "@/contexts/authContext";
+import { EventEntity } from "@/types/allTypes";
 
 const EventDetails = () => {
   const { id } = useLocalSearchParams();
@@ -24,7 +25,7 @@ const EventDetails = () => {
   const eventId = Array.isArray(id) ? id[0] : id;
   const donorId = auth?.user?.donor?.id || null;
 
-  const [event, setEvent] = useState(null);
+  const [event, setEvent] = useState<EventEntity>();
   const [volunteerStatus, setVolunteerStatus] = useState(null);
   const [loadingEvent, setLoadingEvent] = useState(true);
   const [loadingStatus, setLoadingStatus] = useState(true);

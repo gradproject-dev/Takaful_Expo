@@ -9,10 +9,10 @@ interface Props {
   donor: string;
   description: string;
   image: string[];
-  itemId: string;
+  itemId: number;
   category: string;
   itemName: string;
-  rating: number;
+  rating: string;
   lng?: string;
   lat?: string;
 }
@@ -29,15 +29,14 @@ const DonationItem = ({
   lat,
 }: Props) => {
   const router = useRouter();
-
   const handleEvent = () => {
     router.push(`../itemDetails/${itemId}`);
   };
 
   const renderRating = () => {
-    if (rating >= 4) {
+    if (Number(rating) >= 4) {
       return <Text className="text-green-500">Excellent</Text>;
-    } else if (rating >= 3) {
+    } else if (Number(rating) >= 3) {
       return <Text className="text-yellow-500">Good</Text>;
     } else {
       return <Text className="text-red-500">Needs Improvement</Text>;

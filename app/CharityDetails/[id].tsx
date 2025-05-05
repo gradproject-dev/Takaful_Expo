@@ -17,6 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import { BACKENDURL } from "@/constants";
 import fetchData from "@/utils/fetchData";
 import EventItem from "@/components/EventItem";
+import { Charity, EventEntity } from "@/types/allTypes";
 
 const ItemSeparator = () => <View style={{ height: 10 }} />;
 
@@ -28,7 +29,7 @@ const CharityPage = () => {
     data: charityArray,
     isLoading,
     isError,
-  } = useQuery({
+  } = useQuery<Charity[]>({
     queryKey: ["charity", charityId],
     queryFn: () => fetchData(`${BACKENDURL}/charity`, { id: charityId }),
   });
@@ -36,9 +37,9 @@ const CharityPage = () => {
   const charity = charityArray?.[0];
 
   // Modal state
-  const [donateModalVisible, setDonateModalVisible] = useState(false);
-  const [cardNumber, setCardNumber] = useState("");
-  const [cardType, setCardType] = useState("VISA");
+  const [donateModalVisible, setDonateModalVisible] = useState<boolean>(false);
+  const [cardNumber, setCardNumber] = useState<string>("");
+  const [cardType, setCardType] = useState<string>("VISA");
   const [ccv, setCcv] = useState("");
 
   return (
@@ -46,15 +47,15 @@ const CharityPage = () => {
       <FlatList
         data={!isLoading && !isError ? charity?.events || [] : []}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
+        renderItem={({ item }: {item: EventEntity}) => (
           <EventItem
-            id={item.id.toString()}
+            id={item.id}
             name={item.name}
             description={item.description}
-            charityName={item.charity?.name}
-            charityImage={item.charity?.imgUrl}
-            numDonations={0}
-            date={item.date}
+            charityName={item.charity.name}
+            charityImage={item.charity.imgUrl}
+            numDonations={item.volunteers?.length ?? 0}
+            date={item.date.toString()}
             image={item.imgsUrl[0]}
           />
         )}
@@ -65,12 +66,12 @@ const CharityPage = () => {
         ListHeaderComponent={() => (
           <View className="mb-5 w-full">
             {/* Charity Profile Header with Donate Button */}
-            <View className="flex-row justify-between items-center mb-4">
-              <View className="flex-row items-center space-x-3">
+            <View className="flex-row justify-between items-center  mb-4">
+              <View className="flex-row items-center justify-center space-x-3">
                 <Image
                   source={{ uri: charity?.imgUrl }}
                   resizeMode="cover"
-                  className="h-[100px] w-[100px] rounded-full border border-gray-300"
+                  className="h-[100px] w-[100px] rounded-full border mr-3 border-gray-300"
                 />
                 <Text className="text-2xl font-bold text-[#094067]">
                   {charity?.name}
@@ -97,31 +98,7 @@ const CharityPage = () => {
               </Text>
             </View>
 
-            {/* Map Link */}
-            {charity?.lat != null && charity?.lng != null && (
-              <TouchableOpacity
-                onPress={() => {
-                  const url = `https://www.google.com/maps/search/?api=1&query=${charity.lat},${charity.lng}`;
-                  Linking.openURL(url);
-                }}
-                className="bg-blue-100 mt-5 p-3 rounded-xl"
-              >
-                <Text className="text-blue-700 font-semibold">
-                  🌍 View Location on Google Maps
-                </Text>
-              </TouchableOpacity>
-            )}
-
-            {/* Section Title */}
-            {charity?.events?.length > 0 ? (
-              <Text className="text-left text-2xl font-semibold mt-10">
-                Recent Event:
-              </Text>
-            ) : (
-              <Text className="text-center text-2xl font-semibold mt-10">
-                There are no events for this charity
-              </Text>
-            )}
+         
 
             {/* Loader / Error */}
             {isLoading && (
