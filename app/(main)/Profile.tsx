@@ -30,7 +30,7 @@ const Profile = () => {
       createDonation(`${BACKENDURL}/donation`, donationData),
     onSuccess: () => {
       setShowForm(false);
-      queryClient.invalidateQueries({ queryKey: ["donations", donorId] });
+      queryClient.refetchQueries({ queryKey: ["donations"] });
     },
     onError: (error) => {
       console.error("Error adding donation:", error);

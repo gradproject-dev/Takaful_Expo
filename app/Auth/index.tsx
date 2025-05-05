@@ -13,8 +13,8 @@ import { useAuth } from "@/contexts/authContext";
 const Login = () => {
   const router = useRouter();
   const { isLoading, auth, signIn } = useAuth();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   const { mutate, isPending, isError } = useMutation({
     mutationFn: () =>
