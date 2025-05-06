@@ -1,12 +1,30 @@
-import React from "react";
-import { Image, Dimensions, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  Image,
+  Dimensions,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
+} from "react-native";
 import Swiper from "react-native-swiper";
 import { View } from "react-native";
 
-const { width } = Dimensions.get("window");
-import item from "@/assets/images/item.png";
+const { width, height } = Dimensions.get("window");
 
-const ImageSlider = ({images}: {images: string[]}) => {
+const ImageSlider = ({ images }: { images: string[] }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const openFullScreen = (image: string) => {
+    setSelectedImage(image);
+    setModalVisible(true);
+  };
+
+  const closeFullScreen = () => {
+    setModalVisible(false);
+    setSelectedImage(null);
+  };
+
   return (
     <View style={styles.wrapper}>
       <Swiper
@@ -17,14 +35,36 @@ const ImageSlider = ({images}: {images: string[]}) => {
         style={{ borderRadius: 12 }}
       >
         {images.map((image, index) => (
-          <Image
-            key={index}
-            source={{uri : image}}
-            resizeMode="cover"
-            style={styles.image}
-          />
+          <TouchableOpacity key={index} onPress={() => openFullScreen(image)}>
+            <Image
+              source={{ uri: image }}
+              resizeMode="cover"
+              style={styles.image}
+            />
+          </TouchableOpacity>
         ))}
       </Swiper>
+
+      {/* Full-screen modal */}
+      {selectedImage && (
+        <Modal
+          visible={modalVisible}
+          transparent={false}
+          animationType="fade"
+          onRequestClose={closeFullScreen}
+        >
+          <TouchableOpacity
+            style={styles.modalWrapper}
+            onPress={closeFullScreen}
+          >
+            <Image
+              source={{ uri: selectedImage }}
+              style={styles.fullScreenImage}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
+        </Modal>
+      )}
     </View>
   );
 };
@@ -39,6 +79,16 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: "100%",
+  },
+  modalWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+  },
+  fullScreenImage: {
+    width: "100%",
+    height: height, // Make the image fit the full height of the screen
   },
 });
 

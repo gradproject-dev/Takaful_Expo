@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from "expo-router";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -36,7 +36,39 @@ const CharityPage = () => {
 
   const charity = charityArray?.[0];
 
-  // Modal state
+  const [address, setAddress] = useState<string | null>(null); // To store the address
+
+  useEffect(() => {
+    if (charity?.lat && charity?.lng) {
+      fetchAddress(charity.lat, charity.lng);
+    }
+  }, [charity]);
+
+  const fetchAddress = async (lat: number, lng: number) => {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAzmf6d3cEi3aXZgVEsFYHV24dW9rUp3nA`
+      );
+      const data = await response.json();
+      if (data.status === "OK" && data.results.length > 0) {
+        setAddress(data.results[0].formatted_address); // Set the address
+      } else {
+        setAddress("Unable to fetch address");
+      }
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      setAddress("Unable to fetch address");
+    }
+  };
+
+  const openGoogleMaps = () => {
+    if (charity?.lat && charity?.lng) {
+      const url = `https://www.google.com/maps?q=${charity.lat},${charity.lng}`;
+      Linking.openURL(url);
+    }
+  };
+
+  // Modal state for donation
   const [donateModalVisible, setDonateModalVisible] = useState<boolean>(false);
   const [cardNumber, setCardNumber] = useState<string>("");
   const [cardType, setCardType] = useState<string>("VISA");
@@ -47,7 +79,7 @@ const CharityPage = () => {
       <FlatList
         data={!isLoading && !isError ? charity?.events || [] : []}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }: {item: EventEntity}) => (
+        renderItem={({ item }: { item: EventEntity }) => (
           <EventItem
             id={item.id}
             name={item.name}
@@ -66,7 +98,7 @@ const CharityPage = () => {
         ListHeaderComponent={() => (
           <View className="mb-5 w-full">
             {/* Charity Profile Header with Donate Button */}
-            <View className="flex-row justify-between items-center  mb-4">
+            <View className="flex-row justify-between items-center mb-4">
               <View className="flex-row items-center justify-center space-x-3">
                 <Image
                   source={{ uri: charity?.imgUrl }}
@@ -96,9 +128,19 @@ const CharityPage = () => {
               <Text className="text-base text-gray-700">
                 📧 Email: {charity?.email}
               </Text>
-            </View>
 
-         
+              {/* Location: Add the clickable address */}
+              {address ? (
+                <View className="flex-row items-center">
+                  <Text className="text-lg">🏨 Location: </Text>
+                  <Pressable onPress={openGoogleMaps}>
+                    <Text className="text-lg text-blue-500">{address}</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <Text className="text-lg">Loading address...</Text>
+              )}
+            </View>
 
             {/* Loader / Error */}
             {isLoading && (

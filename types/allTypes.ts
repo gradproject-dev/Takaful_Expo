@@ -45,12 +45,14 @@ export type EventEntity = {
   id: number;
   name: string;
   date: Date;
-  location: string;
+  // location: string;
+  lat: string;
+  lng: string;
   description: string;
   deletedAt?: Date;
   charity: Charity;
   volunteers?: Volunteer[];
-  imgsUrl: string[];// make it mandatory
+  imgsUrl: string[]; // make it mandatory
   imgsId?: string[];
   finished: boolean;
 };
@@ -77,12 +79,14 @@ export type Donation = {
   id: number;
   name: string;
   quality: string;
-  imgsUrl?: string[] ;
+  imgsUrl?: string[];
   imgsId?: string[];
   charity: Charity;
   category: Category;
   categoryId: number;
   donor: Donor;
+  lng: string;
+  lat: string;
   description: string;
 };
 
@@ -114,6 +118,11 @@ export type Notification = {
   recipientExpoPushToken: string;
   createdAt: Date;
 };
-export type QualityValue = 'like_new' | 'very_good' | 'good' | 'acceptable' | 'needs_repair';
-export type QualityOptions = { label: string; value: QualityValue }[]
-export type QualityMap =  Record<QualityValue, number>
+export type QualityValue =
+  | "like_new"
+  | "very_good"
+  | "good"
+  | "acceptable"
+  | "needs_repair";
+export type QualityOptions = { label: string; value: QualityValue }[];
+export type QualityMap = Record<QualityValue, number>;

@@ -22,7 +22,7 @@ import { Auth } from "./types";
 const SignupDonor = () => {
   const { signIn } = useJWT();
   const mapRef = useRef<MapView>(null);
-  // const phoneInput = useRef<PhoneInput>(null);
+  const phoneInput = useRef<PhoneInput>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -102,52 +102,52 @@ const SignupDonor = () => {
   };
 
   // Auto-fetch location on mount
-  // useEffect(() => {
-  //   (async () => {
-  //     try {
-  //       setLocationLoading(true);
-  //       const { status } = await Location.requestForegroundPermissionsAsync();
-  //       if (status !== "granted") {
-  //         Alert.alert("Permission Denied", "Location permission is required.");
-  //         return;
-  //       }
-  //       const loc = await Location.getCurrentPositionAsync({});
-  //       const { latitude, longitude } = loc.coords;
-  //       const newCoords = { lat: latitude, lng: longitude };
-  //       setCoordinates(newCoords);
-  //       mapRef.current?.animateToRegion({
-  //         latitude,
-  //         longitude,
-  //         latitudeDelta: 0.01,
-  //         longitudeDelta: 0.01,
-  //       });
-  //     } catch (error) {
-  //       Alert.alert("Error", "Failed to get location.");
-  //     } finally {
-  //       setLocationLoading(false);
-  //     }
-  //   })();
-  // }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        setLocationLoading(true);
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("Permission Denied", "Location permission is required.");
+          return;
+        }
+        const loc = await Location.getCurrentPositionAsync({});
+        const { latitude, longitude } = loc.coords;
+        const newCoords = { lat: latitude, lng: longitude };
+        setCoordinates(newCoords);
+        mapRef.current?.animateToRegion({
+          latitude,
+          longitude,
+          latitudeDelta: 0.01,
+          longitudeDelta: 0.01,
+        });
+      } catch (error) {
+        Alert.alert("Error", "Failed to get location.");
+      } finally {
+        setLocationLoading(false);
+      }
+    })();
+  }, []);
 
-  // const relocateToCurrent = async () => {
-  //   try {
-  //     setLocationLoading(true);
-  //     const loc = await Location.getCurrentPositionAsync({});
-  //     const { latitude, longitude } = loc.coords;
-  //     const newCoords = { lat: latitude, lng: longitude };
-  //     setCoordinates(newCoords);
-  //     mapRef.current?.animateToRegion({
-  //       latitude,
-  //       longitude,
-  //       latitudeDelta: 0.01,
-  //       longitudeDelta: 0.01,
-  //     });
-  //   } catch (err) {
-  //     Alert.alert("Error", "Could not get current location.");
-  //   } finally {
-  //     setLocationLoading(false);
-  //   }
-  // };
+  const relocateToCurrent = async () => {
+    try {
+      setLocationLoading(true);
+      const loc = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = loc.coords;
+      const newCoords = { lat: latitude, lng: longitude };
+      setCoordinates(newCoords);
+      mapRef.current?.animateToRegion({
+        latitude,
+        longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      });
+    } catch (err) {
+      Alert.alert("Error", "Could not get current location.");
+    } finally {
+      setLocationLoading(false);
+    }
+  };
 
   const isFormValid =
     formData.name.trim() &&
@@ -176,7 +176,7 @@ const SignupDonor = () => {
 
       <Input label="Name" onChangeFn={onChangeFunction} />
       <Input label="Email" onChangeFn={onChangeFunction} />
-{/* 
+
       <View style={{ width: "100%", marginBottom: 10 }}>
         <Text className="text-xl font-bold mb-1 ml-2">Phone</Text>
         <PhoneInput
@@ -270,13 +270,13 @@ const SignupDonor = () => {
             />
           </MapView>
         </View>
-      )} */}
+      )}
 
-      {/* <Button
+      <Button
         title={locationLoading ? "Relocating..." : "Relocate to My Location"}
         onPress={relocateToCurrent}
         disabled={locationLoading}
-      /> */}
+      />
 
       <Custombutton
         handlePress={handleSubmit}

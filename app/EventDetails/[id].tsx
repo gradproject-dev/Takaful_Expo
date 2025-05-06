@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -5,8 +6,8 @@ import {
   ActivityIndicator,
   Modal,
   Pressable,
+  Linking,
 } from "react-native";
-import React, { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 
 import Custombutton from "@/components/Button";
@@ -17,27 +18,34 @@ import { BACKENDURL } from "@/constants";
 import formatDate from "@/utils/formatDate";
 import { useAuth } from "@/contexts/authContext";
 import { EventEntity } from "@/types/allTypes";
-import {Volunteer} from "@/types/allTypes";
+import { Volunteer } from "@/types/allTypes";
+
 const EventDetails = () => {
   const { id } = useLocalSearchParams();
   const { auth } = useAuth();
-
   const eventId = Array.isArray(id) ? id[0] : id;
   const donorId = auth?.user?.donor?.id || null;
 
   const [event, setEvent] = useState<EventEntity>();
-  const [volunteerStatus, setVolunteerStatus] = useState<Volunteer |null>(null);
+  const [volunteerStatus, setVolunteerStatus] = useState<Volunteer | null>(
+    null
+  );
   const [loadingEvent, setLoadingEvent] = useState(true);
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [address, setAddress] = useState<string | null>(null); // To store the address
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
         const data = await fetchData(`${BACKENDURL}/event`, { id: eventId });
         setEvent(data);
+        // Fetch the address when event data is loaded
+        if (data.lat && data.lng) {
+          fetchAddress(data.lat, data.lng);
+        }
       } catch (error) {
         console.error("Error fetching event:", error);
       } finally {
@@ -47,28 +55,32 @@ const EventDetails = () => {
     fetchEvent();
   }, [eventId]);
 
-  useEffect(() => {
-    const fetchVolunteerStatus = async () => {
-      if (!donorId) {
-        setLoadingStatus(false);
-        return;
+  const fetchAddress = async (lat: number, lng: number) => {
+    try {
+      console.log("Fetching address for lat:", lat, "lng:", lng); // Log request params
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAzmf6d3cEi3aXZgVEsFYHV24dW9rUp3nA`
+      );
+      const data = await response.json();
+      console.log("Geocoding API Response:", data); // Log API response
+      if (data.status === "OK" && data.results.length > 0) {
+        setAddress(data.results[0].formatted_address); // Set the address
+      } else {
+        console.error("Geocoding API Error:", data.status);
+        setAddress(null);
       }
-      try {
-        const response = await fetch(
-          `${BACKENDURL}/volunteer/check?donorId=${donorId}&eventId=${eventId}`
-        );
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setVolunteerStatus(data.length > 0 ? data[0] : null);
-        }
-      } catch (error) {
-        console.error("Error fetching volunteer status:", error);
-      } finally {
-        setLoadingStatus(false);
-      }
-    };
-    fetchVolunteerStatus();
-  }, [donorId, eventId]);
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      setAddress("Unable to fetch address");
+    }
+  };
+
+  const openGoogleMaps = () => {
+    if (event?.lat && event?.lng) {
+      const url = `https://www.google.com/maps?q=${event.lat},${event.lng}`;
+      Linking.openURL(url);
+    }
+  };
 
   const showToastMessage = (message, duration = 3000) => {
     setToastMessage(message);
@@ -170,7 +182,7 @@ const EventDetails = () => {
     );
   };
 
-  if (loadingEvent || loadingStatus) {
+  if (loadingEvent) {
     return (
       <View className="flex-1 justify-center my-20">
         <ActivityIndicator size="large" />
@@ -190,10 +202,11 @@ const EventDetails = () => {
     name = "",
     description = "",
     date = "",
-    location = "Jordan Amman",
     imgsUrl = [],
     volunteers = [],
     charity = {},
+    lat,
+    lng,
   } = event;
 
   return (
@@ -229,9 +242,17 @@ const EventDetails = () => {
       <View className="w-full ml-6">
         <Text className="font-bold text-2xl">Information</Text>
         <View className="mt-2 w-full ml-4">
-          <Text className="text-lg">Location: {location}</Text>
           <Text className="text-lg">Phone: +962797234701</Text>
-          <Text className="text-lg">Address: Irbid</Text>
+          {address ? (
+            <View className="flex-row items-center">
+              <Text className="text-lg">🏨 Location: </Text>
+              <Pressable onPress={openGoogleMaps}>
+                <Text className="text-lg text-blue-500">{address}</Text>
+              </Pressable>
+            </View>
+          ) : (
+            <Text className="text-lg">Loading address...</Text>
+          )}
         </View>
       </View>
 
@@ -241,7 +262,7 @@ const EventDetails = () => {
   );
 };
 
-const InfoItem = ({ img, text }: {img: string , text:string}) => (
+const InfoItem = ({ img, text }: { img: string; text: string }) => (
   <View className="flex-row items-center">
     <Image
       source={typeof img === "string" ? { uri: img } : img}
