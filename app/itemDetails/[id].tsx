@@ -23,17 +23,19 @@ const Item = () => {
   const [address, setAddress] = useState<string | null>(null); // To store the address
 
   useEffect(() => {
-    if (data?.lat && data?.lng) {
-      fetchAddress(data.lat, data.lng);
+    if (data?.donor?.lat && data.donor?.lng) {
+      fetchAddress(data.donor.lat, data.donor.lng);
     }
   }, [data]);
 
   const fetchAddress = async (lat: string, lng: string) => {
     try {
+      console.log("hello");
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAzmf6d3cEi3aXZgVEsFYHV24dW9rUp3nA`
       );
       const data = await response.json();
+      console.log(data);
       if (data.status === "OK" && data.results.length > 0) {
         setAddress(data.results[0].formatted_address); // Set the address
       } else {
