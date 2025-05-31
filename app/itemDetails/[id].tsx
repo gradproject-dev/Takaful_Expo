@@ -30,7 +30,6 @@ const Item = () => {
 
   const fetchAddress = async (lat: string, lng: string) => {
     try {
-      console.log("hello");
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=AIzaSyAzmf6d3cEi3aXZgVEsFYHV24dW9rUp3nA`
       );
@@ -48,7 +47,7 @@ const Item = () => {
   };
 
   const openGoogleMaps = () => {
-    if (data?.lat && data?.lng) {
+    if (data?.donor?.lat && data?.donor?.lng) {
       const url = `https://www.google.com/maps?q=${data.lat},${data.lng}`;
       Linking.openURL(url);
     }
