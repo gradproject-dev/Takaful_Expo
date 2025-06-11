@@ -158,6 +158,8 @@ const SignupDonor = () => {
     coordinates !== null &&
     formData.password === formData.confirmpassword;
 
+  // add regex validation
+
   return (
     <ScrollView
       contentContainerStyle={{

@@ -22,6 +22,26 @@ const Item = () => {
 
   const [address, setAddress] = useState<string | null>(null); // To store the address
 
+  const openWhatsApp = () => {
+    if (phone && phone !== "N/A") {
+      const formattedPhone = phone.replace(/[^+\d]/g, ""); // Remove unwanted chars
+      const message = "Hi! I'm interested in your donation.";
+      const url = `https://wa.me/${formattedPhone}`;
+      console.log(url);
+      Linking.canOpenURL(url)
+        .then((supported) => {
+          if (supported) {
+            Linking.openURL(url);
+          } else {
+            console.error("WhatsApp not installed or URL not supported");
+          }
+        })
+        .catch((err) => console.error("An error occurred", err));
+    } else {
+      console.warn("Phone number is not available.");
+    }
+  };
+
   useEffect(() => {
     if (data?.donor?.lat && data.donor?.lng) {
       fetchAddress(data.donor.lat, data.donor.lng);
@@ -134,7 +154,10 @@ const Item = () => {
         </View>
       </View>
 
-      <Custombutton buttonStyles="w-full h-14 bg-blue-500 justify-center rounded-2xl mt-8">
+      <Custombutton
+        handlePress={openWhatsApp}
+        buttonStyles="w-full h-14 bg-blue-500 justify-center rounded-2xl mt-8"
+      >
         <Text className="text-center text-2xl text-white font-bold">
           Chat with the Donor
         </Text>
